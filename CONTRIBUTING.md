@@ -1,10 +1,14 @@
 # Contributing to GitNest ✨
 
-First off — **thank you** for considering contributing to GitNest! This project is part of **GSSoC 2026** and we welcome contributors of all skill levels.
+First of all — **Thank you** for considering contributing to GitNest! This project is part of **GSSoC 2026** and we welcome contributors of all skill levels.
 
-**Please Fork and STAR the repo**
-
-Please read this guide fully before making your first contribution. It will save you time and avoid your PR being rejected.
+<h3 align="center">
+  We appreciate your interest in contributing. 😊
+</h3>
+<h4 align="center">
+  This guide will help you get started with the project and make your first contribution.  
+  We’re excited to welcome developers, designers, and testers of all levels.
+</h4>
 
 ---
 
@@ -46,52 +50,63 @@ By participating in this project, you agree to abide by our [Code of Conduct](./
 
 ## Getting Started
 
-### 1. Fork the repository
+1. ⭐ **Star** this repository.
 
-Click the **Fork** button at the top right of this page to create your own copy.
+2. 🍴 **Fork** this repository.
 
-### 2. Clone your fork
+3. 📥 **Clone** your fork:
+   ```
+   git clone https://github.com/<your-github-username>/GitNest.git
+   cd GitNest
+   ```
 
-```bash
-git clone https://github.com/<your-username>/GitNest.git
-cd GitNest
-```
+4. Set up the project
 
-### 3. Add the upstream remote
+5. 🔗 Set upstream to the main repo:
+    ```
+    git remote add upstream https://github.com/Ankita15k/GitNest.git
+    ```
+6. 🌿 Create a new branch:
+    ```
+    git checkout -b <your_branch_name>
+    ```
+    Name branch like: 
+    - feat/cross-reference-feature
+    - fix/image-upload-bug
+    - docs/update-readme
+    - test/add-unit-tests-for-api
+    - chore/improve-ci-workflow
 
-```bash
-git remote add upstream https://github.com/Ankita15k/GitNest.git
-```
+7. ✏️ Make your changes.
 
-Verify with:
-```bash
-git remote -v
-# origin    https://github.com/<your-username>/GitNest.git (fetch)
-# upstream  https://github.com/Ankita15k/GitNest.git (fetch)
-```
+8. 📝 Stage and commit:
+    ```
+    git add <changed_files>
+    git commit -m "<your_commit_message>"
+    ```
+9. 🚀 Push your branch:
+    ```
+    git push origin <your_branch_name>
+    ```
 
-### 4. Set up the project
+10. 🔄 Open a Pull Request on GitHub.
 
-```bash
-# Copy environment variables
-cp server/.env.example server/.env
+    **Before creating a Pull Request** Make sure your branch is up to date with the latest changes from the upstream main branch:
 
-# Install server dependencies
-cd backend && npm install
+    ```
+    git checkout main
+    git pull upstream main
+    git checkout <your_branch_name>
+    git merge main
+    ```
 
-# Install Frontend dependencies
-cd ../frontend && npm install
-```
+11. 🎉 Congratulations! you've made your contribution.
 
-### 5. Run the development servers
 
-```bash
-# Terminal 1 — Backend
-cd backend && npm run dev
 
-# Terminal 2 — Frontend
-cd frontend && npm run dev
-```
+## 💬 Support
+
+Feel Free to raise your doubts in discussion.
 
 ---
 
