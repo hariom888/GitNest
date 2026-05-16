@@ -1,5 +1,5 @@
 ---
-Name: 📖 Documentation update
+name: 📖 Documentation update
 about: Suggest improvements, fixes, or additions to GitNest documentation
 title: "DOC: "
 labels: documentation
