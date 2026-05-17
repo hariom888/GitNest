@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -9,9 +9,11 @@ const Register = () => {
     password: '',
   });
 
-  const { register, loading, error } = useAuthStore();
+  const { register, loading, error, clearError } = useAuthStore();
   const navigate = useNavigate();
-
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
