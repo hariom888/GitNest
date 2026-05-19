@@ -5,17 +5,16 @@ import { sendSuccess } from '../utils/responseHandlers.js';
 import jwt from 'jsonwebtoken';
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not configured in environment');
+  }
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '30d',
   });
 };
 
 export const register = asyncHandler(async (req, res, next) => {
   const { username, email, password } = req.body;
-
-  if (!username || !email || !password) {
-    return next(new AppError('Please provide username, email and password', 400));
-  }
 
   const userExists = await User.findOne({ $or: [{ email }, { username }] });
 
@@ -42,10 +41,6 @@ export const register = asyncHandler(async (req, res, next) => {
 export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return next(new AppError('Please provide an email and password', 400));
-  }
-
   const user = await User.findOne({ email }).select('+password');
 
   if (!user || !(await user.matchPassword(password))) {
@@ -63,6 +58,5 @@ export const login = asyncHandler(async (req, res, next) => {
 });
 
 export const getMe = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  sendSuccess(res, 200, user);
+  sendSuccess(res, 200, req.user, 'User profile fetched successfully');
 });

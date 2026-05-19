@@ -27,6 +27,27 @@ const Login = () => {
     }
   };
 
+  const renderError = () => {
+    if (!error) return null;
+    const message = typeof error === 'string' ? error : error.message;
+    const details = typeof error === 'object' && Array.isArray(error.details)
+      ? error.details
+      : [];
+
+    return (
+      <div className="text-red-500 text-sm text-center">
+        <p>{message}</p>
+        {details.length > 0 && (
+          <ul className="mt-2 space-y-1 text-left">
+            {details.map((detail) => (
+              <li key={detail}>- {detail}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-transparent py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-md w-full space-y-8">
@@ -36,7 +57,7 @@ const Login = () => {
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+          {renderError()}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <input

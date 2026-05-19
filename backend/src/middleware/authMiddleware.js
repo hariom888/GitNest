@@ -18,8 +18,15 @@ export const protect = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-    req.user = await User.findById(decoded.id).select('-password');
+    if (!process.env.JWT_SECRET) {
+      return next(new AppError('Server misconfiguration: JWT_SECRET missing', 500));
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+    if (!user) {
+      return next(new AppError('User associated with token no longer exists', 401));
+    }
+    req.user = user;
     next();
   } catch (error) {
     return next(new AppError('Not authorized to access this route', 401));

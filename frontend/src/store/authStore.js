@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { loginUser, registerUser, getMe } from '../api/authApi';
 
+const getFriendlyAuthError = (error, fallback) => {
+  const payload = error?.response?.data || error;
+  const details = Array.isArray(payload?.errors)
+    ? payload.errors.map((item) => item.message || item.msg || String(item))
+    : [];
+  const message = payload?.message || fallback;
+  return { message, details };
+};
+
 export const useAuthStore = create(
   persist(
     (set) => ({
@@ -16,14 +25,14 @@ export const useAuthStore = create(
         try {
           const res = await loginUser({ email, password });
           set({
-            user: { _id: res.data._id, username: res.data.username, email: res.data.email },
-            token: res.data.token,
+            user: { _id: res._id, username: res.username, email: res.email },
+            token: res.token,
             isAuthenticated: true,
             loading: false,
           });
         } catch (error) {
           set({
-            error: error.response?.data?.message || 'Login failed',
+            error: getFriendlyAuthError(error, 'Login failed'),
             loading: false,
           });
           throw error;
@@ -35,14 +44,14 @@ export const useAuthStore = create(
         try {
           const res = await registerUser(userData);
           set({
-            user: { _id: res.data._id, username: res.data.username, email: res.data.email },
-            token: res.data.token,
+            user: { _id: res._id, username: res.username, email: res.email },
+            token: res.token,
             isAuthenticated: true,
             loading: false,
           });
         } catch (error) {
           set({
-            error: error.response?.data?.message || 'Registration failed',
+            error: getFriendlyAuthError(error, 'Registration failed'),
             loading: false,
           });
           throw error;
@@ -60,7 +69,7 @@ export const useAuthStore = create(
         try {
           const res = await getMe();
           set({
-            user: res.data,
+            user: res,
             isAuthenticated: true,
             loading: false,
           });
