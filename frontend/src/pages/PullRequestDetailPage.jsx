@@ -96,8 +96,8 @@ function DiffChunk({ file }) {
                     chunk.type === 'added'
                       ? 'bg-emerald-500/5 dark:bg-emerald-500/10'
                       : chunk.type === 'removed'
-                      ? 'bg-red-500/5 dark:bg-red-500/10'
-                      : ''
+                        ? 'bg-red-500/5 dark:bg-red-500/10'
+                        : ''
                   }
                 >
                   {/* Line number */}
@@ -111,8 +111,8 @@ function DiffChunk({ file }) {
                         chunk.type === 'added'
                           ? 'text-emerald-400'
                           : chunk.type === 'removed'
-                          ? 'text-red-400'
-                          : 'text-zinc-600'
+                            ? 'text-red-400'
+                            : 'text-zinc-600'
                       }
                     >
                       {chunk.type === 'added' ? '+' : chunk.type === 'removed' ? '-' : ' '}
@@ -161,6 +161,7 @@ function CommentItem({ comment }) {
 }
 
 export default function PullRequestDetailPage() {
+  useParams();
   const { user } = useAuthStore();
   const pr = MOCK_PR; // Replace with: usePR(id) or API call
 
@@ -246,11 +247,10 @@ export default function PullRequestDetailPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.key
+              className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.key
                   ? 'border-emerald-400 text-emerald-400'
                   : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               {tab.icon}
               {tab.label}
@@ -316,22 +316,20 @@ export default function PullRequestDetailPage() {
                 <div className="px-5 py-4 flex flex-wrap gap-3">
                   <button
                     onClick={() => handleReview('approve')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
-                      reviewAction === 'approve'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all ${reviewAction === 'approve'
                         ? 'bg-emerald-400/20 border-emerald-400/40 text-emerald-400'
                         : 'border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:border-emerald-400/30 hover:text-emerald-400'
-                    }`}
+                      }`}
                   >
                     <CheckCircle className="w-4 h-4" />
                     Approve
                   </button>
                   <button
                     onClick={() => handleReview('changes_requested')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
-                      reviewAction === 'changes_requested'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all ${reviewAction === 'changes_requested'
                         ? 'bg-yellow-400/20 border-yellow-400/40 text-yellow-400'
                         : 'border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:border-yellow-400/30 hover:text-yellow-400'
-                    }`}
+                      }`}
                   >
                     <AlertCircle className="w-4 h-4" />
                     Request Changes
@@ -339,11 +337,10 @@ export default function PullRequestDetailPage() {
                 </div>
                 {reviewAction && (
                   <div className="px-5 pb-4">
-                    <div className={`flex items-center gap-2 text-sm px-4 py-2 rounded-xl ${
-                      reviewAction === 'approve'
+                    <div className={`flex items-center gap-2 text-sm px-4 py-2 rounded-xl ${reviewAction === 'approve'
                         ? 'bg-emerald-400/10 text-emerald-400'
                         : 'bg-yellow-400/10 text-yellow-400'
-                    }`}>
+                      }`}>
                       {reviewAction === 'approve'
                         ? <><CheckCircle className="w-4 h-4" /> Review submitted — Approved</>
                         : <><AlertCircle className="w-4 h-4" /> Review submitted — Changes requested</>}
