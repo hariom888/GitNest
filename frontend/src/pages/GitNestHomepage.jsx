@@ -6,6 +6,8 @@ import {
     Sparkles,
     Users,
     ArrowRight,
+    Moon,
+    Sun,
 } from "lucide-react";
 import { Link } from 'react-router-dom';
 import logo from "../assets/logo.png";
@@ -92,8 +94,20 @@ export default function GitNestHomepage() {
                         </a>
                     </nav>
                     <div className='flex items-center gap-3'>
-                        <button onClick={toggleTheme} className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" aria-label="Toggle Theme" >
-                            {isDarkMode ? '🌞 Light' : '🌙 Dark'}
+                        <button
+                            onClick={toggleTheme}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                            aria-label="Toggle Theme"
+                        >
+                            {isDarkMode ? (
+                                <>
+                                    <Moon size={18} />
+                                </>
+                            ) : (
+                                <>
+                                    <Sun size={18} />
+                                </>
+                            )}
                         </button>
                         <div className="flex items-center gap-3">
                             <button className="hidden sm:flex px-4 py-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.03] text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-all">
