@@ -3,7 +3,7 @@ import User from '../models/User.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/AppError.js';
 import { sendSuccess } from '../utils/responseHandlers.js';
-import { logActivity } from '../services/activity.service.js';
+import { logActivitySafely } from '../utils/logActivitySafely.js';
 import ACTIVITY_TYPES from '../constants/activityTypes.js';
 
 export const createRepository = asyncHandler(async (req, res, next)=> {
@@ -33,19 +33,15 @@ export const createRepository = asyncHandler(async (req, res, next)=> {
         topics,
     });
 
-    try {
-        await logActivity({
-            actor: req.user.id,
-            type: ACTIVITY_TYPES.REPOSITORY_CREATED,
-            repository: repository._id,
-            metadata: {
-                repoName: repository.name,
-                visibility: repository.visibility,
-            },
-        });
-    } catch {
-        // Prevent activity logging failures from blocking repository creation
-    }
+    await logActivitySafely({
+        actor: req.user.id,
+        type: ACTIVITY_TYPES.REPOSITORY_CREATED,
+        repository: repository._id,
+        metadata: {
+            repoName: repository.name,
+            visibility: repository.visibility,
+        },
+    });
 
     sendSuccess(res, 201, repository, 'Repository created successfully');
 });
@@ -175,18 +171,14 @@ export const starRepository = asyncHandler(async(req, res, next) => {
     await repository.save();
 
     if (!alreadyStarred) {
-        try {
-            await logActivity({
-                actor: req.user.id,
-                type: ACTIVITY_TYPES.REPOSITORY_STARRED,
-                repository: repository._id,
-                metadata: {
-                    repoName: repository.name,
-                },
-            });
-        } catch {
-            // Prevent activity logging failures from blocking star actions
-        }
+        await logActivitySafely({
+            actor: req.user.id,
+            type: ACTIVITY_TYPES.REPOSITORY_STARRED,
+            repository: repository._id,
+            metadata: {
+                repoName: repository.name,
+            },
+        });
     }
 
     const message = alreadyStarred

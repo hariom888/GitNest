@@ -5,6 +5,25 @@ import { useNavigate, Link } from "react-router-dom";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const PasswordRule = ({ ok, label }) => (
+  <div className="flex items-center gap-2 text-xs">
+    <span
+      className={`w-2 h-2 rounded-full ${
+        ok ? "bg-green-500" : "bg-gray-400 dark:bg-gray-600"
+      }`}
+    />
+    <span
+      className={
+        ok
+          ? "text-green-600 dark:text-green-400"
+          : "text-gray-500 dark:text-gray-400"
+      }
+    >
+      {label}
+    </span>
+  </div>
+);
+
 const Register = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -90,34 +109,15 @@ const Register = () => {
 
       navigate("/");
     } catch (err) {
-      if (err.response?.data?.errors) {
+      if (err?.errors && Array.isArray(err.errors)) {
         const fieldErrors = {};
-        err.response.data.errors.forEach((e) => {
-          fieldErrors[e.field] = e.message;
+        err.errors.forEach((apiError) => {
+          fieldErrors[apiError.field] = apiError.message;
         });
         setValidationErrors(fieldErrors);
       }
     }
   };
-
-  const Rule = ({ ok, label }) => (
-    <div className="flex items-center gap-2 text-xs">
-      <span
-        className={`w-2 h-2 rounded-full ${
-          ok ? "bg-green-500" : "bg-gray-400 dark:bg-gray-600"
-        }`}
-      />
-      <span
-        className={
-          ok
-            ? "text-green-600 dark:text-green-400"
-            : "text-gray-500 dark:text-gray-400"
-        }
-      >
-        {label}
-      </span>
-    </div>
-  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-10">
@@ -223,10 +223,10 @@ const Register = () => {
 
               {/* Password Rules */}
               <div className="mt-2 space-y-1">
-                <Rule ok={passwordRules.length} label="At least 8 characters" />
-                <Rule ok={passwordRules.upper} label="One uppercase letter" />
-                <Rule ok={passwordRules.lower} label="One lowercase letter" />
-                <Rule ok={passwordRules.number} label="One number" />
+                <PasswordRule ok={passwordRules.length} label="At least 8 characters" />
+                <PasswordRule ok={passwordRules.upper} label="One uppercase letter" />
+                <PasswordRule ok={passwordRules.lower} label="One lowercase letter" />
+                <PasswordRule ok={passwordRules.number} label="One number" />
               </div>
 
               {validationErrors.password && (
