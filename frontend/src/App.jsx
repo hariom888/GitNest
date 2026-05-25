@@ -18,6 +18,7 @@ import ActivityFeedPage from './pages/ActivityFeed.jsx';
 import ComponentShowcase from './pages/ComponentShowcase.jsx';
 import BackToTop from './components/BackToTop/BackToTop';
 import GitNestTerms from './pages/GitNestTerms.jsx';
+import RepositoryArchitecturePage from './pages/repositories/RepositoryArchitecturePage.jsx';
 
 const Dashboard = () => {
   const { user, logout } = useAuthStore();
@@ -59,6 +60,7 @@ function App() {
           <Route path="/pull-requests" element={<PullRequestsPage />} />
           <Route path="/pull-requests/:id" element={<PullRequestDetailPage />} />
           <Route path="/activities" element={<ActivityFeedPage />} />
+          <Route path="/:owner/:repo/architecture" element={<RepositoryArchitecturePage />} />
           <Route path="/:username" element={<UserProfile />} />
           <Route path="/showcase" element={<ComponentShowcase />} />
           <Route path="/terms" element={<GitNestTerms />} />
