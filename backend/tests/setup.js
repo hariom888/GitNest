@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { jest } from '@jest/globals';
 import dotenv from 'dotenv';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
