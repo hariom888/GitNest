@@ -10,13 +10,20 @@ jest.setTimeout(30000);
 let mongoServer;
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryServer.create({
+    binary: {
+      version: '7.0.14',
+    },
+  });
+
   const uri = mongoServer.getUri();
+
   await mongoose.connect(uri);
 }, 30000);
 
 afterEach(async () => {
   const collections = mongoose.connection.collections;
+
   for (const key in collections) {
     await collections[key].deleteMany({});
   }
@@ -24,6 +31,7 @@ afterEach(async () => {
 
 afterAll(async () => {
   await mongoose.disconnect();
+
   if (mongoServer) {
     await mongoServer.stop();
   }
