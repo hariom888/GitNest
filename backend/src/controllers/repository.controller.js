@@ -401,33 +401,43 @@ export const forkRepository = asyncHandler(
                 { session }
             );
 
-            await Repository.findByIdAndUpdate(
-                original._id,
-                { $addToSet: { forks: forked._id } },
-                { session }
-            );
+        // Resolve a safe fork name — auto-suffix if original name is taken
+        // by a non-fork repo already in the user's account
+        let forkName = original.name;
+        const nameConflict = await Repository.findOne({
+            owner: req.user.id,
+            name: forkName,
+        });
 
-            await session.commitTransaction();
-        } catch (error) {
-            if (session.inTransaction()) {
-                await session.abortTransaction();
-            }
-
-            if (error.code === 11000) {
+        if (nameConflict) {
+            forkName = `${original.name}-fork`;
+            const suffixConflict = await Repository.findOne({
+                owner: req.user.id,
+                name: forkName,
+            });
+            if (suffixConflict) {
                 return next(
                     new AppError(
-                        'You have already forked this repository',
-                        400
+                        `A repository named "${forkName}" already exists in your account. Please rename it first.`,
+                        409
                     )
                 );
             }
-
-            return next(
-                new AppError('Fork operation failed', 500)
-            );
-        } finally {
-            session.endSession();
         }
+
+        const forked = await Repository.create({
+            name: forkName,
+            owner: req.user.id,
+            description: original.description,
+            visibility: 'public',
+            language: original.language,
+            topics: original.topics,
+            defaultBranch: original.defaultBranch,
+            forkedFrom: original._id,
+        });
+
+        original.forks.push(forked._id);
+        await original.save();
 
         sendSuccess(
             res,
