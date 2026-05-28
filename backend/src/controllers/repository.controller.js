@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import simpleGit from 'simple-git';
-import mongoose from 'mongoose';
 import Repository from '../models/Repository.model.js';
 import User from '../models/User.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -423,6 +422,40 @@ export const forkRepository = asyncHandler(
             );
         }
 
+        const existing = await Repository.findOne({
+            forkedFrom: original._id,
+            owner: req.user.id,
+        });
+
+        if (existing) {
+            return next(
+                new AppError(
+                    'You have already forked this repository',
+                    400
+                )
+            );
+        }
+
+        // Resolve a safe fork name — auto-suffix if original name is taken
+        let forkName = original.name;
+        const nameConflict = await Repository.findOne({
+            owner: req.user.id,
+            name: forkName,
+        });
+
+        if (nameConflict) {
+            forkName = `${original.name}-fork`;
+            const suffixConflict = await Repository.findOne({
+                owner: req.user.id,
+                name: forkName,
+            });
+            if (suffixConflict) {
+                return next(
+                    new AppError(
+                        `A repository named "${forkName}" already exists in your account. Please rename it first.`,
+                        409
+                    )
+                );
         const sagaId = req.headers['idempotency-key'] || uuidv4();
         const actorId = req.user.id;
 
