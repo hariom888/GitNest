@@ -10,17 +10,7 @@ import paginate, { buildPaginationMeta } from '../utils/paginate.js';
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
 
-  let user;
-
-  // If the parameter is a valid Mongoose ObjectId, attempt to find by ID first
-  if (mongoose.Types.ObjectId.isValid(username)) {
-    user = await User.findById(username);
-  }
-
-  // Fallback to finding by username if not found by ID or if ID was invalid
-  if (!user) {
-    user = await User.findOne({ username: username.toLowerCase() });
-  }
+  const user = await User.findOne({ username: username.toLowerCase() });
 
   if (!user) {
     return next(new AppError('User not found', 404));
