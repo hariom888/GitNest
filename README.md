@@ -156,10 +156,9 @@ GitNest/
 | `.github/workflows/` | GitHub Actions CI/CD workflows     |
 | `docker-compose.yml` | Multi-container Docker setup       |
 
----
-
 *** For complete component documentation and examples, see [`frontend/src/components/COMPONENTS_DOCUMENTATION.md`](frontend/src/components/COMPONENTS_DOCUMENTATION.md).
 
+---
 
 ## 🚀 Getting Started
 
@@ -231,7 +230,25 @@ You can easily run the entire application (Frontend, Backend, MongoDB, Redis) us
    - Backend API: http://localhost:5000/api/v1
 
 
+---
 
+<!-- ## Project Admin 👩🏻‍💻 -->
+
+
+## ✨ Contributors - The People Behind GitNest ✨ 
+
+
+
+A heartfelt Thanks to all the stellar developers who make **GitNest** better every day 🩵💫
+
+
+<p align="center">
+  <a href="https://github.com/Ankita15k/GitNest/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=Ankita15k/GitNest" alt="Contributors"/>
+  </a>
+</p>
+
+---
 
 ## 🤝 Contributing
 
@@ -245,33 +262,7 @@ We love contributions! GitNest is a **GSSoC 2026** project and welcomes develope
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for full details on the workflow, coding standards, and commit message format.
 
-<!-- ## Project Admin 👩🏻‍💻 -->
-
-## Contributors - The People Behind GitNest 💖 
-
-
-A heartfelt Thanks to all the stellar developers who make **GitNest** better every day 🚀
-
-
-<p align="center">
-  <a href="https://github.com/Ankita15k/GitNest/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=Ankita15k/GitNest" alt="Contributors"/>
-  </a>
-</p>
-
-## 🗺️ Roadmap
-
-- [ ] Project scaffolding & Express server setup
-- [ ] MongoDB schemas & Mongoose models
-- [ ] Auth service (JWT + GitHub OAuth)
-- [ ] Repository CRUD & file browser
-- [ ] Issues & Pull Requests
-- [ ] User profiles & social features
-- [ ] Search
-- [ ] Real-time notifications
-- [ ] Tests (unit + integration)
-- [x] Docker setup (docker-compose for full stack)
-- [ ] Deployment & CI/CD
+---
    
 ## 📜 License
 
