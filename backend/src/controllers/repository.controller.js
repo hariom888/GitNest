@@ -366,12 +366,46 @@ export const forkRepository = asyncHandler(async (req, res, next) => {
     original.forks.push(forked._id);
     await original.save({ session });
     await session.commitTransaction();
-
-    sendSuccess(res, 201, forked, "Repository forked successfully");
   } catch (error) {
     await session.abortTransaction();
-    next(error);
+    return next(error);
   } finally {
     session.endSession();
   }
+
+  // Clone filesystem storage from source to fork
+  try {
+    const sourcePath = path.resolve(
+      process.cwd(),
+      "repositories",
+      original.owner.toString(),
+      original.name,
+    );
+
+    const targetPath = path.resolve(
+      process.cwd(),
+      "repositories",
+      req.user.id,
+      forked.name,
+    );
+
+    fs.mkdirSync(targetPath, { recursive: true });
+
+    if (fs.existsSync(path.join(sourcePath, ".git"))) {
+      const sourceGit = simpleGit(sourcePath);
+      const log = await sourceGit.log({ maxCount: 1 }).catch(() => ({ total: 0 }));
+      if (log.total > 0) {
+        await simpleGit().clone(sourcePath, targetPath);
+      } else {
+        await simpleGit(targetPath).init();
+      }
+    } else {
+      await simpleGit(targetPath).init();
+    }
+  } catch (error) {
+    await Repository.deleteOne({ _id: forked._id });
+    return next(new AppError("Failed to copy repository storage during fork", 500));
+  }
+
+  sendSuccess(res, 201, forked, "Repository forked successfully");
 });
