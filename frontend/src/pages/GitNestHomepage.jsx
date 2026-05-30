@@ -47,7 +47,7 @@ export default function GitNestHomepage() {
 
 
 
-        <div className="min-h-screen bg-white dark:bg-[#06070a] text-zinc-900 dark:text-white transition-colors overflow-hidden">
+        <div className="relative min-h-screen overflow-hidden overflow-x-hidden bg-white dark:bg-slate-950 text-zinc-900 dark:text-white transition-colors">
             {/* Background Effects */}
             <div className="absolute inset-0 -z-10">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-500/5 dark:bg-emerald-500/10 blur-[120px] rounded-full" />
@@ -55,9 +55,9 @@ export default function GitNestHomepage() {
             </div>
 
             {/* Navbar */}
-            <header className="fixed left-0 w-full top-0 z-50 border-b border-zinc-200 dark:border-white/5 backdrop-blur-xl bg-white/80 dark:bg-[#06070a]/80 transition-colors">
-                <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3 cursor-pointer select-none">
+            <header className="fixed left-0 w-full top-0 z-50 border-b border-zinc-200 dark:border-white/5 backdrop-blur-xl bg-white/80 dark:bg-slate-950/80 transition-colors">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-0 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between min-h-[4rem] md:h-16">
+                    <div className="flex items-center gap-3 cursor-pointer select-none min-w-0">
 
                         <div className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-white flex items-center justify-center overflow-hidden shadow-2xl shadow-emerald-500/20 border border-zinc-200 dark:border-white/10 p-1">
                             <img
@@ -91,19 +91,19 @@ export default function GitNestHomepage() {
                             Contributors
                         </a>
                     </nav>
-                    <div className='flex items-center gap-3'>
-                        <button onClick={toggleTheme} className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" aria-label="Toggle Theme" >
+                    <div className='flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3 w-full sm:w-auto'>
+                        <button onClick={toggleTheme} className="w-full sm:w-auto px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm text-center" aria-label="Toggle Theme" >
                             {isDarkMode ? '🌞 Light' : '🌙 Dark'}
                         </button>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2 justify-end w-full sm:w-auto">
                             <Link
                                 to="/docs"
-                                className="hidden sm:flex px-4 py-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.03] text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-all"
+                                className="hidden sm:inline-flex px-3 sm:px-4 py-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.03] text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-all"
                             >
                                 Documentation
                             </Link>
 
-                            <Link to="/register" className="px-5 py-2 rounded-xl bg-emerald-400 text-black font-semibold text-sm hover:scale-[1.02] transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                            <Link to="/register" className="w-full sm:w-auto max-w-[12rem] px-4 sm:px-5 py-2 rounded-xl bg-emerald-400 text-black font-semibold text-sm hover:scale-[1.02] transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
                                 Start Contributing
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
@@ -114,7 +114,7 @@ export default function GitNestHomepage() {
 
             {/* Hero */}
             <section className="relative">
-                <div className="max-w-7xl mx-auto px-6 pt-28 pb-24 grid lg:grid-cols-2 gap-16 items-center">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-24 grid lg:grid-cols-2 gap-16 items-center">
                     {/* Left */}
                     <div>
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 text-emerald-300 text-sm mb-8">
@@ -122,7 +122,7 @@ export default function GitNestHomepage() {
                             Open Source • GSSoC 2026
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl font-black leading-none tracking-tight mb-8">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black leading-tight tracking-tight mb-8">
                             Build the future of
                             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-cyan-400">
                                 collaborative coding
@@ -134,16 +134,16 @@ export default function GitNestHomepage() {
                         </p>
 
                         <div className="flex flex-wrap gap-4 mb-14">
-                            <Link to="/login" className="px-7 py-4 rounded-2xl bg-emerald-400 text-black font-semibold hover:scale-[1.02] transition-all shadow-xl shadow-emerald-500/20 inline-block text-center">
+                            <Link to="/login" className="w-full max-w-[16rem] sm:w-auto px-6 sm:px-7 py-4 rounded-2xl bg-emerald-400 text-black font-semibold hover:scale-[1.02] transition-all shadow-xl shadow-emerald-500/20 inline-flex justify-center text-center">
                                 Explore Repositories
                             </Link>
 
-                            <button className="px-7 py-4 rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-all">
+                            <button className="w-full max-w-[16rem] sm:w-auto px-6 sm:px-7 py-4 rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-all">
                                 View Architecture
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                             {stats.map((item) => (
                                 <div
                                     key={item.label}
@@ -162,7 +162,7 @@ export default function GitNestHomepage() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 blur-3xl rounded-full" />
 
-                        <div className="relative rounded-3xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#0d1016]/80 backdrop-blur-xl overflow-hidden shadow-2xl shadow-black/40">
+                        <div className="relative rounded-3xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-slate-900/80 backdrop-blur-xl overflow-hidden shadow-2xl shadow-black/40">
                             {/* Window Header */}
                             <div className="h-14 border-b border-zinc-200 dark:border-white/5 flex items-center justify-between px-6 bg-zinc-100 dark:bg-white/[0.02]">
                                 <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ export default function GitNestHomepage() {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         <div className="absolute top-5 right-5 w-32 h-32 bg-emerald-400/10 blur-3xl rounded-full" />
                                         <div className="rounded-xl border border-white/5 bg-black/20 p-4">
                                             <div className="text-2xl font-black">42</div>

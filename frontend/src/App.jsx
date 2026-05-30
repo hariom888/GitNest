@@ -57,11 +57,12 @@ function App() {
         <Route path="/pull-requests" element={<PullRequestsPage />} />
         <Route path="/pull-requests/:id" element={<PullRequestDetailPage />} />
         <Route path="/activities" element={<ActivityFeedPage />} />
-        <Route path="/:username" element={<UserProfile />} />
-
+        <Route path="/404" element={<NotFound />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
+        {/* UserProfile validates usernames locally and keeps explicit routes ahead of username handling. */}
+        <Route path="/:username" element={<UserProfile />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

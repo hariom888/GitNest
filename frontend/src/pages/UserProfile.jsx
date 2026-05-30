@@ -1,9 +1,9 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin, LinkIcon, Calendar, Users, BookOpen } from 'lucide-react';
 import { fetchUserProfile } from '../api/userApi';
 import { useAuthStore } from '../store/authStore';
-import { ProfileSkeleton } from '../components/ui/Skeleton';
+// ProfileSkeleton intentionally not used to avoid flash on invalid routes
 import FollowButton from '../components/profile/FollowButton';
 import EditProfileButton from '../components/profile/EditProfileButton';
 
@@ -11,24 +11,46 @@ const UserProfile = () => {
   const { username } = useParams();
   const { user: authUser, isAuthenticated } = useAuthStore();
 
-  const { data: profile, isLoading, isError } = useQuery({
+  // Validate username locally (do not short-circuit hooks), compute flag.
+  const validUsername = /^[a-zA-Z0-9_-]{3,30}$/;
+  const isValidUsername = validUsername.test(username || '');
+
+  // Call hooks unconditionally; disable query when username is invalid.
+  const { data: profile, isLoading, isError, error } = useQuery({
     queryKey: ['profile', username],
     queryFn: () => fetchUserProfile(username),
     retry: 1,
+    enabled: Boolean(username) && isValidUsername,
   });
 
-  if (isLoading) return <ProfileSkeleton />;
+  // Do not show the ProfileSkeleton for invalid/random routes. During loading
+  // we render nothing (avoids flash). If the request returns 404 or a
+  // USER_NOT_FOUND message, redirect immediately to /404.
+  // If the username pattern is invalid, redirect to 404 without firing requests.
+  if (!isValidUsername) return <Navigate to="/404" replace />;
+
+  if (isLoading) return null;
 
   if (isError) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || '';
+    if (status === 404 || message === 'USER_NOT_FOUND') {
+      return <Navigate to="/404" replace />;
+    }
+
+    // Non-404 errors: show a friendly error message.
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <p className="text-zinc-500 dark:text-zinc-400 text-lg">User not found.</p>
+        <p className="text-zinc-500 dark:text-zinc-400 text-lg">Unable to load profile. Please try again later.</p>
         <Link to="/" className="mt-4 inline-block text-emerald-500 hover:underline text-sm">
           Go home
         </Link>
       </div>
     );
   }
+
+  // Guard against cases where no profile data is available yet.
+  if (!profile) return null;
 
   const isOwnProfile = isAuthenticated && authUser?.username === profile.username;
   const isFollowing = isAuthenticated && profile.followers?.some(
