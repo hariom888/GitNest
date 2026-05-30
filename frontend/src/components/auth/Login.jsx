@@ -74,14 +74,14 @@ const Login = () => {
     if (Object.keys(errors).length > 0) return;
 
     try {
-      await login(formData.email.trim(), formData.password.trim());
+      const user = await login(formData.email.trim(), formData.password.trim());
 
       addToast({
         message: "Signed in successfully!",
         type: "success",
       });
 
-      navigate("/");
+      navigate(`/user/${user.username}`, { replace: true });
     } catch (err) {
       if (err?.errors && Array.isArray(err.errors)) {
         const fieldErrors = {};

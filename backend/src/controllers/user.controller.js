@@ -45,7 +45,7 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
     await redis.set(cacheKey, JSON.stringify(userObj), 'EX', 60);
   }
 
-  sendSuccess(res, 200, user, 'User profile fetched successfully');
+  sendSuccess(res, 200, userObj, 'User profile fetched successfully');
 });
 
 // Follow a user with transaction-safe atomicity
