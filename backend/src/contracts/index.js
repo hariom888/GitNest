@@ -74,6 +74,63 @@ const pullRequestBody = {
   },
 };
 
+const branchProtectionRule = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    _id: { type: 'string' },
+    id: { type: 'string' },
+    repositoryId: { type: 'string' },
+    branchPattern: { type: 'string' },
+    requirePullRequest: { type: 'boolean' },
+    requiredApprovalsCount: { type: 'integer', minimum: 0 },
+    requireStatusChecks: { type: 'boolean' },
+    createdAt: sharedSchemas.timestamp,
+    updatedAt: sharedSchemas.timestamp,
+  },
+  required: ['branchPattern'],
+};
+
+const branchProtectionRuleList = {
+  type: 'array',
+  items: branchProtectionRule,
+};
+
+const branchProtectionCreateBody = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    branchPattern: { type: 'string', minLength: 1, maxLength: 100 },
+    requirePullRequest: { type: 'boolean' },
+    requiredApprovalsCount: { type: 'integer', minimum: 0, maximum: 10 },
+    requireStatusChecks: { type: 'boolean' },
+  },
+  required: ['branchPattern'],
+};
+
+const branchProtectionUpdateBody = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    branchPattern: { type: 'string', minLength: 1, maxLength: 100 },
+    requirePullRequest: { type: 'boolean' },
+    requiredApprovalsCount: { type: 'integer', minimum: 0, maximum: 10 },
+    requireStatusChecks: { type: 'boolean' },
+  },
+  minProperties: 1,
+};
+
+const branchProtectionRuleIdParam = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    username: { type: 'string', minLength: 1, maxLength: 39 },
+    reponame: { type: 'string', minLength: 1, maxLength: 100 },
+    ruleId: { type: 'string', minLength: 1 },
+  },
+  required: ['username', 'reponame', 'ruleId'],
+};
+
 const idParam = {
   type: 'object',
   additionalProperties: true,
@@ -150,6 +207,32 @@ export const contracts = {
     close: { tags: ['Pull Requests'], security: [{ bearerAuth: [] }], request: { params: idParam }, responses: { 200: sharedSchemas.successEnvelope(sharedSchemas.pullRequest) } },
     comment: { tags: ['Pull Requests'], security: [{ bearerAuth: [] }], request: { params: idParam, body: { type: 'object', additionalProperties: false, properties: { body: { type: 'string', minLength: 1 }, type: { type: 'string', enum: ['general', 'review'] } }, required: ['body'] } }, responses: { 201: sharedSchemas.successEnvelope(sharedSchemas.pullRequestComment) } },
     review: { tags: ['Pull Requests'], security: [{ bearerAuth: [] }], request: { params: idParam, body: { type: 'object', additionalProperties: false, properties: { action: { type: 'string', enum: ['approve', 'changes_requested', 'comment'] }, comment: { type: 'string' } }, required: ['action'] } }, responses: { 201: sharedSchemas.successEnvelope(sharedSchemas.review) } },
+  },
+  branchProtection: {
+    list: {
+      tags: ['Repositories'],
+      security: [{ bearerAuth: [] }],
+      request: { params: sharedSchemas.repoParam },
+      responses: { 200: branchProtectionRuleList },
+    },
+    create: {
+      tags: ['Repositories'],
+      security: [{ bearerAuth: [] }],
+      request: { params: sharedSchemas.repoParam, body: branchProtectionCreateBody },
+      responses: { 201: branchProtectionRule },
+    },
+    update: {
+      tags: ['Repositories'],
+      security: [{ bearerAuth: [] }],
+      request: { params: branchProtectionRuleIdParam, body: branchProtectionUpdateBody },
+      responses: { 200: branchProtectionRule },
+    },
+    remove: {
+      tags: ['Repositories'],
+      security: [{ bearerAuth: [] }],
+      request: { params: branchProtectionRuleIdParam },
+      responses: { 200: { type: 'object', additionalProperties: false, properties: { deleted: { type: 'boolean' } }, required: ['deleted'] } },
+    },
   },
   security: {
     scan: { tags: ['Security'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 202: sharedSchemas.successEnvelope({ type: 'object', additionalProperties: true }) } },

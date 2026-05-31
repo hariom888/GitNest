@@ -1,28 +1,29 @@
-import { Routes, Route } from "react-router-dom";
-import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuthStore } from "./store/authStore";
-import { useThemeStore } from "./store/useThemeStore";
-import { useEffect } from "react";
-import ToastContainer from "./components/ui/ToastContainer";
-import "./App.css";
-import Login from "./components/auth/Login";
-import Register from "./components/auth/Register";
-import GitNestHomepage from "./pages/GitNestHomepage";
-import DocumentationPage from "./pages/DocumentationPage";
-import NotFound from "./pages/NotFound";
-import PullRequestsPage from "./pages/PullRequestsPage";
-import PullRequestDetailPage from "./pages/PullRequestDetailPage";
-import UserProfile from "./pages/UserProfile";
-import ActivityFeedPage from "./pages/ActivityFeed.jsx";
-import ComponentShowcase from "./pages/ComponentShowcase.jsx";
-import GitNestPrivacy from "./pages/GitNestPrivacy.jsx";
-import BackToTop from "./components/BackToTop/BackToTop";
-import GitNestTerms from "./pages/GitNestTerms.jsx";
-import RepositoryArchitecturePage from "./pages/repositories/RepositoryArchitecturePage.jsx";
-import OAuthSuccess from "./pages/OAuthSuccess.jsx";
-import ContactPage from "./pages/ContactPage";
+import { Routes, Route } from 'react-router-dom';
+import ErrorBoundary from './components/ui/ErrorBoundary.jsx';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useThemeStore } from './store/useThemeStore';
+import { useEffect } from 'react';
+import ToastContainer from './components/ui/ToastContainer';
+import './App.css';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import GitNestHomepage from './pages/GitNestHomepage';
+import DocumentationPage from './pages/DocumentationPage';
+import NotFound from './pages/NotFound';
+import PullRequestsPage from './pages/PullRequestsPage';
+import PullRequestDetailPage from './pages/PullRequestDetailPage';
+import UserProfile from './pages/UserProfile';
+import ActivityFeedPage from './pages/ActivityFeed.jsx';
+import ComponentShowcase from './pages/ComponentShowcase.jsx';
+import GitNestPrivacy from './pages/GitNestPrivacy.jsx';
+import BackToTop from './components/BackToTop/BackToTop';
+import GitNestTerms from './pages/GitNestTerms.jsx';
+import RepositoryArchitecturePage from './pages/repositories/RepositoryArchitecturePage.jsx';
+import RepositorySettingsPage from './pages/RepositorySettingsPage.jsx';
+import OAuthSuccess from './pages/OAuthSuccess.jsx';
+import ContactPage from './pages/ContactPage';
 import Dashboard from './pages/Dashboard';
+
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -50,10 +51,8 @@ function App() {
             element={<PullRequestDetailPage />}
           />
           <Route path="/activities" element={<ActivityFeedPage />} />
-          <Route
-            path="/:owner/:repo/architecture"
-            element={<RepositoryArchitecturePage />}
-          />
+          <Route path="/:owner/:repo/architecture" element={<RepositoryArchitecturePage />} />
+          <Route path="/:username/:reponame/settings/branch-protection" element={<RepositorySettingsPage />} />
           <Route path="/user/:username" element={<UserProfile />} />
           <Route path="/showcase" element={<ComponentShowcase />} />
           <Route path="/privacy" element={<GitNestPrivacy />} />

@@ -4,6 +4,7 @@ import AppError from "../utils/AppError.js";
 import { sendSuccess } from "../utils/responseHandlers.js";
 import jwt from "jsonwebtoken";
 import generateToken from "../utils/generateToken.js";
+import eventEmitter from '../events/eventEmitter.js';
 // const generateToken = (id) => {
 //   if (!process.env.JWT_SECRET) {
 //     throw new Error('JWT_SECRET is not configured in environment');
@@ -52,6 +53,12 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   const token = generateToken(user._id);
+
+  eventEmitter.emit('USER_LOGGED_IN', {
+    actorId: user._id,
+    email: user.email,
+    ipAddress: req.ip,
+  });
 
   sendSuccess(
     res,

@@ -1,35 +1,38 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import mongoSanitize from "express-mongo-sanitize";
-import hpp from "hpp";
-import morgan from "morgan";
-import rateLimit from "express-rate-limit";
-import swaggerUi from "swagger-ui-express";
-import authRoutes from "./routes/auth.routes.js";
-import userRoutes from "./routes/user.routes.js";
-import repositoryRoutes from "./routes/repository.routes.js";
-import activityRoutes from "./routes/activity.routes.js";
-import pullRequestRoutes from "./routes/pullRequest.routes.js";
-import architectureRoutes from "./routes/architectureRoutes.js";
-import healthRoute from "./routes/health.route.js";
-import commitHistoryRoutes from "./routes/commitHistory.routes.js";
-import fileBrowserRoutes from "./routes/fileBrowser.routes.js";
-import errorHandler from "./middleware/errorHandler.js";
-import AppError from "./utils/AppError.js";
-import swaggerSpec from "./config/swagger.js";
-import {
-  requestIdMiddleware,
-  attachRequestIdToResponse,
-} from "./middleware/requestId.js";
-import { sendError } from "./utils/responseHandlers.js";
-import ERROR_CODES from "./constants/errorCodes.js";
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import hpp from 'hpp';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import repositoryRoutes from './routes/repository.routes.js';
+import branchProtectionRoutes from './routes/branchProtection.routes.js';
+import auditLogRoutes from './routes/auditLog.routes.js';
+import activityRoutes from './routes/activity.routes.js';
+import pullRequestRoutes from './routes/pullRequest.routes.js';
+import architectureRoutes from './routes/architectureRoutes.js';
+import healthRoute from './routes/health.route.js';
+import commitHistoryRoutes from './routes/commitHistory.routes.js';
+import fileBrowserRoutes from './routes/fileBrowser.routes.js';
+import errorHandler from './middleware/errorHandler.js';
+import AppError from './utils/AppError.js';
+import swaggerSpec from './config/swagger.js';
+import { requestIdMiddleware, attachRequestIdToResponse } from './middleware/requestId.js';
+import { sendError } from './utils/responseHandlers.js';
+import ERROR_CODES from './constants/errorCodes.js';
+import './events/subscribers.js';
+import { registerAuditSubscribers } from './events/auditSubscribers.js';
 
 import passport from "passport";
 import session from "express-session";
 
 import "./config/passport.js";
 import githubAuthRoutes from "./routes/auth.github.routes.js";
+
+registerAuditSubscribers();
 
 const createApp = () => {
   const app = express();
@@ -100,18 +103,20 @@ const createApp = () => {
     app.use("/api", apiLimiter);
   }
 
-  app.use("/health", healthRoute);
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  app.get("/api-docs.json", (req, res) => res.status(200).json(swaggerSpec));
-  app.use("/api/v1/auth", authRoutes);
-  app.use("/api/v1/repos", repositoryRoutes);
-  app.use("/api/v1/repositories", repositoryRoutes);
-  app.use("/api/v1/architecture", architectureRoutes);
-  app.use("/api/v1/users", userRoutes);
-  app.use("/api/v1/activities", activityRoutes);
-  app.use("/api/v1/pull-requests", pullRequestRoutes);
-  app.use("/api/v1/repositories", commitHistoryRoutes);
-  app.use("/api/v1/repositories", fileBrowserRoutes);
+  app.use('/health', healthRoute);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.get('/api-docs.json', (req, res) => res.status(200).json(swaggerSpec));
+  app.use('/api/v1/auth', authRoutes);
+  app.use('/api/v1/repos', repositoryRoutes);
+  app.use('/api/v1/repos', branchProtectionRoutes);
+  app.use('/api/v1/repos', auditLogRoutes);
+  app.use('/api/v1/repositories', repositoryRoutes);
+  app.use('/api/v1/architecture', architectureRoutes);
+  app.use('/api/v1/users', userRoutes);
+  app.use('/api/v1/activities', activityRoutes);
+  app.use('/api/v1/pull-requests', pullRequestRoutes);
+  app.use('/api/v1/repositories', commitHistoryRoutes);
+  app.use('/api/v1/repositories', fileBrowserRoutes);
   app.use("/api/v1/auth", githubAuthRoutes);
   app.use((req, res, next) => {
     next(
