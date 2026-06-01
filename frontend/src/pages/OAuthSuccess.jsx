@@ -12,7 +12,7 @@ function OAuthSuccess() {
       localStorage.setItem("token", token);
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   return <div>Signing in...</div>;
 }

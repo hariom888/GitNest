@@ -1,34 +1,19 @@
-
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import logo from "../assets/logo.png";
 import { useThemeStore } from "../store/useThemeStore";
 
-const MotionLink = motion.create(Link);
+const MotionLink = motion(Link);
 
 const pageVariants = {
   hidden: { opacity: 0, y: 28 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.85,
-      ease: "easeOut",
-      when: "beforeChildren",
-      staggerChildren: 0.14,
-      delayChildren: 0.12,
-    },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.85, ease: "easeOut", when: "beforeChildren", staggerChildren: 0.14, delayChildren: 0.12 } },
 };
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.72, ease: "easeOut" },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.72, ease: "easeOut" } },
 };
 
 const floatLogo = {
@@ -36,20 +21,7 @@ const floatLogo = {
   transition: { duration: 6, repeat: Infinity, ease: "easeInOut" },
 };
 
-const buttonMotion = {
-  whileHover: { scale: 1.04, boxShadow: "0 0 24px rgba(16, 185, 129, 0.22)" },
-  whileTap: { scale: 0.97 },
-};
-
-const particles = [
-  { size: 88, x: "8%", y: "12%", opacity: 0.18, color: "from-emerald-400/30" },
-  { size: 104, x: "78%", y: "16%", opacity: 0.12, color: "from-cyan-400/20" },
-  { size: 56, x: "22%", y: "72%", opacity: 0.14, color: "from-fuchsia-400/20" },
-  { size: 68, x: "66%", y: "70%", opacity: 0.16, color: "from-slate-400/20" },
-  { size: 40, x: "52%", y: "28%", opacity: 0.2, color: "from-emerald-400/30" },
-];
-
-const NotFound = () => {
+export default function NotFound() {
   const { isDarkMode } = useThemeStore();
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
@@ -67,9 +39,7 @@ const NotFound = () => {
     return () => window.removeEventListener("keydown", handleEscKey);
   }, [navigate]);
 
-  const motionMainProps = shouldReduceMotion
-    ? { initial: false, animate: false }
-    : { initial: "hidden", animate: "visible", variants: pageVariants };
+  const motionMainProps = shouldReduceMotion ? { initial: false, animate: false } : { initial: "hidden", animate: "visible", variants: pageVariants };
 
   return (
     <motion.main
@@ -81,24 +51,22 @@ const NotFound = () => {
       role="main"
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-50 via-cyan-50 to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" />
-
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {particles.map((particle, index) => (
-          <motion.div
+        {Array.from({ length: 6 }).map((_, index) => (
+          <motion.span
             key={index}
             aria-hidden="true"
-            className={`absolute rounded-full bg-gradient-to-br ${particle.color} to-transparent blur-3xl`}
+            className="absolute rounded-full bg-gradient-to-br from-[#00dc82]/20 to-transparent blur-3xl"
             style={{
-              width: particle.size,
-              height: particle.size,
-              left: particle.x,
-              top: particle.y,
-              opacity: particle.opacity,
+              width: 120 + index * 40,
+              height: 120 + index * 40,
+              left: `${10 + index * 14}%`,
+              top: `${12 + index * 10}%`,
+              opacity: 0.16,
             }}
             {...(shouldReduceMotion
               ? {}
-              : { animate: { y: [0, -18, 0], x: [0, 10, 0] }, transition: { duration: 8 + index, repeat: Infinity, ease: "easeInOut" } }
-            )}
+              : { animate: { y: [0, -18, 0], x: [0, 10, 0] }, transition: { duration: 8 + index, repeat: Infinity, ease: "easeInOut" } })}
           />
         ))}
       </div>
@@ -110,20 +78,12 @@ const NotFound = () => {
           aria-label="GitNest 404 navigation"
         >
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-3">
-            <motion.div
-              className="flex h-16 w-16 items-center justify-center rounded-3xl border border-slate-200 bg-white/90 shadow-lg shadow-slate-900/5 dark:border-slate-700 dark:bg-slate-900/70"
-              {...floatLogo}
-            >
+            <motion.div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-slate-200 bg-white/90 shadow-lg shadow-slate-900/5 dark:border-slate-700 dark:bg-slate-900/70" {...floatLogo}>
               <img src={logo} alt="GitNest logo" className="h-10 w-10 object-contain" />
             </motion.div>
-
             <div className="space-y-1 text-center sm:text-left">
-              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-400">
-                GitNest
-              </p>
-              <p className="text-[0.72rem] leading-5 text-slate-500 dark:text-slate-400 sm:text-xs">
-                Developer-first git activity explorer
-              </p>
+              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-400">GitNest</p>
+              <p className="text-[0.72rem] leading-5 text-slate-500 dark:text-slate-400 sm:text-xs">Developer-first git activity explorer</p>
             </div>
           </div>
 
@@ -151,7 +111,6 @@ const NotFound = () => {
             <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-emerald-600 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300">
               Repository Not Found
             </div>
-
             <div className="space-y-6 text-center lg:text-left">
               <h1 id="page-title" className="text-5xl sm:text-6xl md:text-7xl lg:text-[8rem] font-black tracking-tight text-slate-950 dark:text-white leading-none">
                 404
@@ -170,16 +129,17 @@ const NotFound = () => {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-start">
             <MotionLink
               to="/"
-              {...buttonMotion}
+              whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(16, 185, 129, 0.22)" }}
+              whileTap={{ scale: 0.97 }}
               className="inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-emerald-500/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
               aria-label="Go back to home page"
             >
               Go Home
             </MotionLink>
-
             <MotionLink
               to="/docs"
-              {...buttonMotion}
+              whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(14, 165, 233, 0.18)" }}
+              whileTap={{ scale: 0.97 }}
               className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-950 transition hover:border-cyan-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 px-6 py-3"
               aria-label="View documentation"
             >
@@ -203,83 +163,5 @@ const NotFound = () => {
         </footer>
       </section>
     </motion.main>
-
-import { Link } from "react-router-dom";
-import { ArrowLeft, SearchX } from "lucide-react";
-
-export default function NotFound() {
-  return (
-    <div className="relative min-h-screen overflow-hidden bg-[#f6f8f7] dark:bg-[#07090d] flex items-center justify-center px-6">
-
-      {/* Background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-
-        <div className="absolute -top-[200px] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(0,220,130,0.12),transparent_60%)] blur-3xl" />
-
-        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-400/10 blur-3xl" />
-
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right,#000 1px,transparent 1px), linear-gradient(to bottom,#000 1px,transparent 1px)",
-            backgroundSize: "80px 80px",
-          }}
-        />
-      </div>
-
-      {/* Card */}
-      <div className="w-full h-screen rounded-none border border-white/50 dark:border-white/10 bg-white/75 dark:bg-[#0c0f14]/70 backdrop-blur-2xl shadow-[0_30px_80px_rgba(15,23,42,0.12)] flex flex-col items-center justify-center text-center px-6">
-
-        {/* Badge */}
-        <div className="inline-flex items-center gap-3 px-5 py-3 rounded-full border border-[#00dc82]/10 bg-white/60 dark:bg-white/[0.03] backdrop-blur-xl text-[#1edb8c] shadow-lg mb-8">
-          <SearchX className="w-4 h-4" />
-          <span className="text-sm font-medium">
-            ERROR • ROUTE_NOT_FOUND
-          </span>
-        </div>
-
-        {/* 404 */}
-        <h1 className="text-[110px] md:text-[180px] leading-none font-black tracking-[-0.08em] bg-gradient-to-r from-[#00dc82] via-[#36e4da] to-[#4fd1ff] bg-clip-text text-transparent">
-          404
-        </h1>
-
-        {/* Title */}
-        <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#071138] dark:text-white mt-4">
-          GitNest Disconnected
-        </h2>
-
-        {/* Description */}
-        <p className="text-lg leading-8 text-[#64748b] dark:text-zinc-400 max-w-2xl mx-auto mt-6">
-          The page you are looking for could not be found. It may have been
-          moved, deleted, or the URL might be incorrect.
-        </p>
-
-        {/* Actions */}
-        <div className="flex flex-wrap justify-center gap-5 mt-10">
-
-          <Link
-            to="/"
-            className="group px-8 py-4 rounded-3xl bg-gradient-to-r from-[#00dc82] to-[#36e4da] text-black font-bold shadow-[0_15px_45px_rgba(0,220,130,0.30)] hover:-translate-y-1 transition-all flex items-center gap-3"
-          >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            Return Home
-          </Link>
-
-          <Link
-            to="/docs"
-            className="px-8 py-4 rounded-3xl border border-zinc-200 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] backdrop-blur-xl text-zinc-700 dark:text-zinc-200 hover:shadow-xl transition-all"
-          >
-            View Documentation
-          </Link>
-
-        </div>
-
-        {/* Footer */}
-        <div className="mt-10 text-xs tracking-[0.3em] uppercase text-zinc-500">
-          GitNest • Repository Not Found
-        </div>
-      </div>
-    </div>
   );
 }
