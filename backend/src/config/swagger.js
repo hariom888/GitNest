@@ -76,6 +76,10 @@ const paths = {
   '/api/v1/pull-requests/{id}/close': { post: op(contracts.pullRequests.close) },
   '/api/v1/pull-requests/{id}/comments': { post: op(contracts.pullRequests.comment) },
   '/api/v1/pull-requests/{id}/reviews': { post: op(contracts.pullRequests.review) },
+  '/api/v1/repositories/{username}/{reponame}/index': { post: op(contracts.codeIntelligence.triggerIndex) },
+  '/api/v1/repositories/{username}/{reponame}/index/status/{indexId}': { get: op(contracts.codeIntelligence.indexStatus) },
+  '/api/v1/repositories/{username}/{reponame}/symbols/search': { get: op(contracts.codeIntelligence.searchSymbols) },
+  '/api/v1/repositories/{username}/{reponame}/symbols/{symbolId}': { get: op(contracts.codeIntelligence.symbolDetails) },
 };
 
 const definition = {
@@ -86,7 +90,7 @@ const definition = {
     description: 'Schema-driven API contract for GitNest MERN services.',
   },
   servers: [{ url: process.env.API_PUBLIC_URL || 'http://localhost:5000' }],
-  tags: ['Auth', 'Users', 'Repositories', 'Activities', 'Pull Requests'].map((name) => ({ name })),
+  tags: ['Auth', 'Users', 'Repositories', 'Activities', 'Pull Requests', 'Code Intelligence'].map((name) => ({ name })),
   components,
   paths,
 };

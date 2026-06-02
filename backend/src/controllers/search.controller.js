@@ -13,7 +13,16 @@ const SEARCH_TYPES = {
   ALL: 'all',
 };
 
-const performSearch = async (query, type, skip, limit) => {
+const visibleRepoIds = async (userId) => {
+  const repos = await Repository.find(
+    userId
+      ? { $or: [{ visibility: 'public' }, { owner: userId }] }
+      : { visibility: 'public' },
+  ).select('_id').lean();
+  return repos.map(r => r._id);
+};
+
+const performSearch = async (query, type, skip, limit, userId) => {
   const searchFilter = { $text: { $search: query } };
   const projections = {
     users: { username: 1, displayName: 1, avatarUrl: 1, bio: 1, _id: 1, createdAt: 1 },
@@ -41,15 +50,21 @@ const performSearch = async (query, type, skip, limit) => {
   }
 
   if (type === SEARCH_TYPES.ALL || type === SEARCH_TYPES.REPOSITORIES) {
+    const repoFilter = {
+      ...searchFilter,
+      ...(userId
+        ? { $or: [{ visibility: 'public' }, { owner: userId }] }
+        : { visibility: 'public' }),
+    };
     queries.push(
       Promise.all([
-        Repository.find(searchFilter)
+        Repository.find(repoFilter)
           .select(projections.repositories)
           .populate('owner', 'username avatarUrl')
           .skip(skip)
           .limit(limit)
           .lean(),
-        Repository.countDocuments(searchFilter)
+        Repository.countDocuments(repoFilter)
       ]).then(([docs, count]) => ({
         type: SEARCH_TYPES.REPOSITORIES,
         items: docs,
@@ -60,20 +75,23 @@ const performSearch = async (query, type, skip, limit) => {
 
   if (type === SEARCH_TYPES.ALL || type === SEARCH_TYPES.PULL_REQUESTS) {
     queries.push(
-      Promise.all([
-        PullRequest.find(searchFilter)
-          .select(projections.pullRequests)
-          .populate('author', 'username avatarUrl')
-          .populate('repository', 'name owner')
-          .skip(skip)
-          .limit(limit)
-          .lean(),
-        PullRequest.countDocuments(searchFilter)
-      ]).then(([docs, count]) => ({
-        type: SEARCH_TYPES.PULL_REQUESTS,
-        items: docs,
-        count
-      }))
+      visibleRepoIds(userId).then((ids) => {
+        const prFilter = { ...searchFilter, repository: { $in: ids } };
+        return Promise.all([
+          PullRequest.find(prFilter)
+            .select(projections.pullRequests)
+            .populate('author', 'username avatarUrl')
+            .populate('repository', 'name owner')
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+          PullRequest.countDocuments(prFilter),
+        ]).then(([docs, count]) => ({
+          type: SEARCH_TYPES.PULL_REQUESTS,
+          items: docs,
+          count,
+        }));
+      })
     );
   }
 
@@ -94,9 +112,10 @@ export const globalSearch = asyncHandler(async (req, res, next) => {
   }
 
   const { page: pageNum, limit: limitNum, skip } = paginate(page, limit);
+  const userId = req.user?._id;
 
   try {
-    const searchResults = await performSearch(q.trim(), type, skip, limitNum);
+    const searchResults = await performSearch(q.trim(), type, skip, limitNum, userId);
 
     const formattedResults = {};
     let totalCount = 0;

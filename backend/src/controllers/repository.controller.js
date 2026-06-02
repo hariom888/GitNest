@@ -3,6 +3,8 @@ import path from "path";
 import simpleGit from "simple-git";
 import mongoose from "mongoose";
 import Repository from "../models/Repository.model.js";
+import PullRequest from "../models/PullRequest.model.js";
+import Activity from "../models/Activity.model.js";
 import User from "../models/User.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/AppError.js";
@@ -175,8 +177,60 @@ export const updateRepository = asyncHandler(async (req, res, next) => {
     return next(new AppError("Repository not found", 404));
   }
 
-  const { description, visibility, language, topics, defaultBranch } = req.body;
+  const { name, description, visibility, language, topics, defaultBranch } = req.body;
 
+  if (name && !/^[a-zA-Z0-9._-]+$/.test(name)) {
+    return next(
+      new AppError(
+        "Repository name contains invalid characters",
+        400
+      )
+    );
+  }
+  if (name && name !== repository.name) {
+    const existingRepo = await Repository.findOne({
+      owner: req.user.id,
+      name,
+    });
+
+    if (existingRepo) {
+      return next(
+        new AppError(
+          "You already have a repository with this name",
+          400
+        )
+      );
+    }
+
+    const oldRepoPath = path.resolve(
+      process.cwd(),
+      "repositories",
+      req.user.id,
+      repository.name
+    );
+
+    const newRepoPath = path.resolve(
+      process.cwd(),
+      "repositories",
+      req.user.id,
+      name
+    );
+
+    try {
+      if (fs.existsSync(oldRepoPath)) {
+        fs.renameSync(oldRepoPath, newRepoPath);
+      }
+    } catch {
+      return next(
+        new AppError(
+          "Failed to rename repository storage",
+          500
+        )
+      );
+    }
+
+    repository.name = name;
+  }
   repository.description = description ?? repository.description;
 
   repository.visibility = visibility ?? repository.visibility;
@@ -216,6 +270,30 @@ export const deleteRepository = asyncHandler(async (req, res, next) => {
   if (!repository) {
     return next(new AppError("Repository not found", 404));
   }
+
+  const repoId = repository._id;
+
+  // 1. Remove filesystem directory
+  const repoPath = path.resolve(process.cwd(), "repositories", req.user.id, repository.name);
+  fs.rmSync(repoPath, { recursive: true, force: true });
+
+  // 2. Nullify forkedFrom on repos that forked from this one
+  await Repository.updateMany(
+    { forkedFrom: repoId },
+    { $set: { forkedFrom: null } },
+  );
+
+  // 3. Remove this repo ID from forks arrays of other repos
+  await Repository.updateMany(
+    { forks: repoId },
+    { $pull: { forks: repoId } },
+  );
+
+  // 4. Delete orphaned Activity records referencing this repository
+  await Activity.deleteMany({ repository: repoId });
+
+  // 5. Delete PullRequest documents referencing this repository
+  await PullRequest.deleteMany({ repository: repoId });
 
   await repository.deleteOne();
 

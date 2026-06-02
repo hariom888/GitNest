@@ -3,17 +3,9 @@ import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useToastStore } from "../store/useToastStore";
 import { useThemeStore } from '../store/useThemeStore';
 import {
-    GitBranch,
-    ShieldCheck,
-    Sparkles,
-    Users,
     ArrowRight,
     Sun,
     Moon,
-    Layers3,
-    Code2,
-    Wand2,
-    Shield,
     Menu, X
 } from "lucide-react";
 import { Link } from 'react-router-dom';
@@ -89,7 +81,7 @@ export default function ContactPage() {
 
             {/* NAVBAR */}
             <header className="fixed top-4 inset-x-0 z-50 px-3 md:px-6">
-                <div className="max-w-7xl mx-auto h-16 md:h-20 rounded-[24px] md:rounded-[28px] border border-white/50 dark:border-white/10 bg-white/75 dark:bg-[#0c0f14]/70 backdrop-blur-2xl shadow-[0_8px_40px_rgba(15,23,42,0.08)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.45)] flex items-center justify-between px-4 md:px-8 transition-all">
+                <div className="max-w-7xl mx-auto h-16 md:h-20 rounded-[24px] md:rounded-[28px] border border-white/50 dark:border-white/10 bg-white/75 dark:bg-[#0c0f14]/70 backdrop-blur-2xl shadow-2xl flex items-center justify-between px-6">
 
                     {/* LOGO */}
                     <div className="flex items-center gap-4 cursor-pointer">
@@ -123,7 +115,8 @@ export default function ContactPage() {
                                 key={item.name}
                                 href={item.href}
                                 onClick={() => setActiveLink(item.href)}
-                                className={`relative text-[15px] font-medium transition-all duration-300 ${activeLink === item.href
+                                className={`relative text-[15px] font-medium transition-all duration-300 ${
+                                    activeLink === item.href
                                     ? "text-zinc-950 dark:text-white"
                                     : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
                                     }`}
@@ -148,7 +141,8 @@ export default function ContactPage() {
                             className="relative w-[90px] h-12 rounded-full bg-white dark:bg-[#11151c] border border-zinc-200 dark:border-white/10 shadow-inner flex items-center px-1"
                         >
                             <div
-                                className={`absolute top-1 w-10 h-10 rounded-full bg-gradient-to-br from-[#00dc82] to-cyan-400 transition-all duration-500 shadow-lg ${isDarkMode ? "translate-x-[45px]" : "translate-x-0"
+                                className={`absolute top-1 w-10 h-10 rounded-full bg-gradient-to-br from-[#00dc82] to-cyan-400 transition-all duration-500 shadow-lg ${
+                                    isDarkMode ? "translate-x-[40px]" : "translate-x-0"
                                     }`}
                             />
 
@@ -167,14 +161,14 @@ export default function ContactPage() {
 
                         <Link
                             to="/docs"
-                            className="hidden md:flex px-6 py-3 rounded-2xl border border-zinc-200 dark:border-white/20 bg-white/70 dark:bg-white/[0.03] backdrop-blur-xl text-zinc-700 dark:text-zinc-200 hover:shadow-lg transition-all"
+                            className="hidden md:flex px-6 py-3 rounded-2xl border border-zinc-200 dark:border-white/20 bg-white/70 dark:bg-white/[0.03] backdrop-blur-xl text-zinc-700 dark:text-zinc-300 font-medium transition-colors"
                         >
                             Documentation
                         </Link>
 
                         <Link
                             to="/register"
-                            className="hidden lg:flex group px-5 rounded-2xl bg-gradient-to-r from-[#00dc82] via-[#2be4da] to-[#4fd1ff] text-black font-bold shadow-[0_10px_40px_rgba(0,220,130,0.35)] hover:-translate-x-1 transition-all duration-300 items-center gap-2"
+                            className="hidden lg:flex group px-5 rounded-2xl bg-gradient-to-r from-[#00dc82] via-[#2be4da] to-[#4fd1ff] text-black font-bold shadow-[0_10px_40px_rgba(0,220,130,0.3)] hover:shadow-[0_10px_60px_rgba(0,220,130,0.4)] transition-shadow items-center gap-2"
                         >
                             Start Contributing
 
@@ -245,7 +239,7 @@ export default function ContactPage() {
 
                     {/* Heading */}
                     <div className="text-center mb-20">
-                        <span className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-[#00dc82]/20 bg-white/60 dark:bg-white/[0.03] backdrop-blur-xl text-[#00dc82] font-medium">
+                        <span className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-[#00dc82]/20 bg-white/60 dark:bg-white/[0.03] backdrop-blur-xl text-[#00dc82] font-medium text-sm">
                             Contact GitNest
                         </span>
 
@@ -308,7 +302,7 @@ export default function ContactPage() {
                                     placeholder="Your Name"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
+                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-emerald-400 transition-colors"
                                 />
 
                                 <input
@@ -317,7 +311,7 @@ export default function ContactPage() {
                                     placeholder="Your Email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
+                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-emerald-400 transition-colors"
                                 />
 
                                 <input
@@ -326,7 +320,7 @@ export default function ContactPage() {
                                     placeholder="Subject"
                                     value={formData.subject}
                                     onChange={handleChange}
-                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
+                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-emerald-400 transition-colors"
                                 />
 
                                 <textarea
@@ -335,12 +329,12 @@ export default function ContactPage() {
                                     placeholder="Write your message..."
                                     value={formData.message}
                                     onChange={handleChange}
-                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none resize-none text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
+                                    className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-5 py-4 outline-none resize-none text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-emerald-400 transition-colors"
                                 />
 
                                 <button
                                     type="submit"
-                                    className="group w-full py-4 rounded-2xl bg-gradient-to-r from-[#00dc82] via-[#2be4da] to-[#4fd1ff] text-black font-bold flex items-center justify-center gap-3 hover:scale-[1.02] transition-all"
+                                    className="group w-full py-4 rounded-2xl bg-gradient-to-r from-[#00dc82] via-[#2be4da] to-[#4fd1ff] text-black font-bold flex items-center justify-center gap-3 hover:shadow-[0_15px_50px_rgba(0,220,130,0.3)] transition-shadow"
                                 >
                                     Send Message
                                     <Send className="w-5 h-5" />

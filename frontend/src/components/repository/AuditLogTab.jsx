@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuditLogs } from '../../hooks/useAuditLogs.js';
 
 const ACTION_TYPES = [
@@ -30,7 +30,6 @@ const getRelativeTime = (value) => {
   }
 
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-
   if (seconds < 5) return 'Just now';
   if (seconds < 60) return `${seconds} secs ago`;
   const minutes = Math.floor(seconds / 60);
@@ -53,15 +52,23 @@ const formatTimestamp = (value) => {
   return date.toLocaleString();
 };
 
+const initialState = {
+  page: 1,
+  filters: initialFilters,
+  selectedLog: null,
+};
+
 export default function AuditLogTab({ username, reponame }) {
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState(initialFilters);
-  const [selectedLog, setSelectedLog] = useState(null);
+  const [state, setState] = useState(initialState);
+  const { page, filters, selectedLog } = state;
+  const previousKeyRef = useRef(`${username}:${reponame}`);
 
   useEffect(() => {
-    setPage(1);
-    setFilters(initialFilters);
-    setSelectedLog(null);
+    setState({
+      page: 1,
+      filters: initialFilters,
+      selectedLog: null,
+    });
   }, [username, reponame]);
 
   const queryFilters = {
@@ -83,8 +90,18 @@ export default function AuditLogTab({ username, reponame }) {
   const totalPages = pagination.totalPages ?? 1;
 
   const handleClearFilters = () => {
-    setFilters(initialFilters);
-    setPage(1);
+    setState((current) => ({ ...current, page: 1, filters: initialFilters }));
+  };
+
+  const updateFilter = (field, value) => {
+    setState((current) => ({
+      ...current,
+      page: 1,
+      filters: {
+        ...current.filters,
+        [field]: value,
+      },
+    }));
   };
 
   return (
@@ -95,10 +112,7 @@ export default function AuditLogTab({ username, reponame }) {
             <span className="text-zinc-600 dark:text-zinc-300">Action Type</span>
             <select
               value={filters.actionType}
-              onChange={(event) => {
-                setFilters((current) => ({ ...current, actionType: event.target.value }));
-                setPage(1);
-              }}
+              onChange={(event) => updateFilter('actionType', event.target.value)}
               className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-400 dark:border-white/10 dark:bg-zinc-950 dark:text-white"
             >
               <option value="">All Actions</option>
@@ -109,52 +123,39 @@ export default function AuditLogTab({ username, reponame }) {
               ))}
             </select>
           </label>
-
           <label className="grid gap-1 text-sm">
             <span className="text-zinc-600 dark:text-zinc-300">Actor ID</span>
             <input
               type="text"
               value={filters.actorId}
-              onChange={(event) => {
-                setFilters((current) => ({ ...current, actorId: event.target.value }));
-                setPage(1);
-              }}
+              onChange={(event) => updateFilter('actorId', event.target.value)}
               placeholder="Filter by user ID"
               className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-emerald-400 dark:border-white/10 dark:bg-zinc-950 dark:text-white"
             />
           </label>
-
           <label className="grid gap-1 text-sm">
             <span className="text-zinc-600 dark:text-zinc-300">Start Date</span>
             <input
               type="date"
               value={filters.startDate}
-              onChange={(event) => {
-                setFilters((current) => ({ ...current, startDate: event.target.value }));
-                setPage(1);
-              }}
+              onChange={(event) => updateFilter('startDate', event.target.value)}
               className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-400 dark:border-white/10 dark:bg-zinc-950 dark:text-white"
             />
           </label>
-
           <label className="grid gap-1 text-sm">
             <span className="text-zinc-600 dark:text-zinc-300">End Date</span>
             <input
               type="date"
               value={filters.endDate}
-              onChange={(event) => {
-                setFilters((current) => ({ ...current, endDate: event.target.value }));
-                setPage(1);
-              }}
+              onChange={(event) => updateFilter('endDate', event.target.value)}
               className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-400 dark:border-white/10 dark:bg-zinc-950 dark:text-white"
             />
           </label>
-
           <div className="flex items-end">
             <button
               type="button"
               onClick={handleClearFilters}
-              className="h-10 rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/[0.04]"
+              className="h-10 rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/[0.05]"
             >
               Clear Filters
             </button>
@@ -168,13 +169,9 @@ export default function AuditLogTab({ username, reponame }) {
             Loading audit logs...
           </div>
         ) : isError ? (
-          <div className="px-6 py-16 text-center text-sm text-red-500">
-            Failed to load audit logs.
-          </div>
+          <div className="px-6 py-16 text-center text-sm text-red-500">Failed to load audit logs.</div>
         ) : logs.length === 0 ? (
-          <div className="px-6 py-16 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            No audit log entries found.
-          </div>
+          <div className="px-6 py-16 text-center text-sm text-zinc-500 dark:text-zinc-400">No audit log entries found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-zinc-200 dark:divide-white/10">
@@ -190,23 +187,17 @@ export default function AuditLogTab({ username, reponame }) {
                 {logs.map((log) => (
                   <tr
                     key={log._id}
-                    onClick={() => setSelectedLog(log)}
+                    onClick={() => setState((current) => ({ ...current, selectedLog: log }))}
                     className="cursor-pointer transition hover:bg-zinc-50 dark:hover:bg-white/[0.04]"
                   >
-                    <td className="px-6 py-4 text-sm text-zinc-900 dark:text-zinc-100">
-                      {log.actorId?.username || log.actorId || 'Unknown'}
-                    </td>
+                    <td className="px-6 py-4 text-sm text-zinc-900 dark:text-zinc-100">{log.actorId?.username || log.actorId || 'Unknown'}</td>
                     <td className="px-6 py-4 text-sm text-zinc-900 dark:text-zinc-100">
                       <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-1 font-mono text-xs text-zinc-700 dark:bg-white/10 dark:text-zinc-200">
                         {log.actionType}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">
-                      {log.repositoryId?.name || reponame || 'Repository'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
-                      {getRelativeTime(log.createdAt)}
-                    </td>
+                    <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">{log.repositoryId?.name || reponame || 'Repository'}</td>
+                    <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">{getRelativeTime(log.createdAt)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -216,13 +207,11 @@ export default function AuditLogTab({ username, reponame }) {
       </div>
 
       <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm dark:border-white/10 dark:bg-white/[0.03] dark:text-zinc-300 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          Page {pagination.page || page} of {totalPages}
-        </div>
+        <div>Page {pagination.page || page} of {totalPages}</div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
+            onClick={() => setState((current) => ({ ...current, page: Math.max(1, current.page - 1) }))}
             disabled={page <= 1}
             className="rounded-xl border border-zinc-200 px-4 py-2 font-medium text-zinc-700 transition disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:text-zinc-300"
           >
@@ -230,7 +219,7 @@ export default function AuditLogTab({ username, reponame }) {
           </button>
           <button
             type="button"
-            onClick={() => setPage((current) => current + 1)}
+            onClick={() => setState((current) => ({ ...current, page: current.page + 1 }))}
             disabled={page >= totalPages}
             className="rounded-xl border border-zinc-200 px-4 py-2 font-medium text-zinc-700 transition disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:text-zinc-300"
           >
@@ -249,40 +238,30 @@ export default function AuditLogTab({ username, reponame }) {
               </div>
               <button
                 type="button"
-                onClick={() => setSelectedLog(null)}
-                className="rounded-xl border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/[0.04]"
+                onClick={() => setState((current) => ({ ...current, selectedLog: null }))}
+                className="rounded-xl border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/[0.05]"
               >
                 Close
               </button>
             </div>
-
             <div className="grid gap-4 px-6 py-5 sm:grid-cols-2">
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Actor</div>
-                <div className="mt-1 text-sm text-zinc-900 dark:text-zinc-100">
-                  {selectedLog.actorId?.username || selectedLog.actorId || 'Unknown'}
-                </div>
+                <div className="mt-1 text-sm text-zinc-900 dark:text-zinc-100">{selectedLog.actorId?.username || selectedLog.actorId || 'Unknown'}</div>
               </div>
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Action</div>
-                <div className="mt-1 font-mono text-sm text-zinc-900 dark:text-zinc-100">
-                  {selectedLog.actionType}
-                </div>
+                <div className="mt-1 font-mono text-sm text-zinc-900 dark:text-zinc-100">{selectedLog.actionType}</div>
               </div>
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">IP Address</div>
-                <div className="mt-1 text-sm text-zinc-900 dark:text-zinc-100">
-                  {selectedLog.ipAddress || 'N/A'}
-                </div>
+                <div className="mt-1 text-sm text-zinc-900 dark:text-zinc-100">{selectedLog.ipAddress || 'N/A'}</div>
               </div>
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Created At</div>
-                <div className="mt-1 text-sm text-zinc-900 dark:text-zinc-100">
-                  {formatTimestamp(selectedLog.createdAt)}
-                </div>
+                <div className="mt-1 text-sm text-zinc-900 dark:text-zinc-100">{formatTimestamp(selectedLog.createdAt)}</div>
               </div>
             </div>
-
             <div className="border-t border-zinc-200 px-6 py-5 dark:border-white/10">
               <div className="mb-2 text-xs uppercase tracking-[0.2em] text-zinc-500">Metadata</div>
               <pre className="max-h-80 overflow-auto rounded-2xl bg-zinc-950 p-4 text-xs leading-6 text-zinc-100">
