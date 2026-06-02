@@ -1,9 +1,9 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin, LinkIcon, Calendar, Users, BookOpen } from 'lucide-react';
 import { fetchUserProfile } from '../api/userApi';
 import { useAuthStore } from '../store/authStore';
-import { ProfileSkeleton } from '../components/ui/Skeleton';
+// ProfileSkeleton intentionally not used to avoid flash on invalid routes.
 import FollowButton from '../components/profile/FollowButton';
 import EditProfileButton from '../components/profile/EditProfileButton';
 import ErrorState from '../components/ui/ErrorState.jsx';
@@ -14,42 +14,48 @@ import { useApiRetry } from '../hooks/useApiRetry.js';
 const UserProfileContent = ({ username }) => {
   const { user: authUser, isAuthenticated } = useAuthStore();
 
-  const {
-    data: profile,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
+  const validUsername = /^[a-zA-Z0-9_-]{3,30}$/;
+  const isValidUsername = validUsername.test(username || '');
+
+  const { data: profile, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['profile', username],
     queryFn: () => fetchUserProfile(username),
+    retry: 1,
+    enabled: Boolean(username) && isValidUsername,
   });
 
   const { retry, isRetrying, isRetryable } = useApiRetry(refetch, error);
 
+  if (!isValidUsername) {
+    return <Navigate to="/404" replace />;
+  }
+
   if (isLoading) {
-    return <ProfileSkeleton />;
+    return null;
   }
 
   if (isError) {
-    const isNotFound = error?.status === 404 || error?.code === 'NOT_FOUND';
+    const status = error?.response?.status ?? error?.status;
+    const message = error?.response?.data?.message || error?.message || '';
+    const isNotFound =
+      status === 404 ||
+      message === 'USER_NOT_FOUND' ||
+      message === 'NOT_FOUND' ||
+      error?.code === 'NOT_FOUND';
+
+    if (isNotFound) {
+      return <Navigate to="/404" replace />;
+    }
 
     return (
       <ErrorState
-        title={isNotFound ? 'User not found' : 'Unable to load profile'}
-        message={
-          isNotFound
-            ? `We could not find a user named "${username}".`
-            : error?.message || 'Something went wrong while loading this profile.'
-        }
-        onRetry={!isNotFound && isRetryable ? retry : undefined}
+        title="Unable to load profile"
+        message={error?.message || 'Something went wrong while loading this profile.'}
+        onRetry={isRetryable ? retry : undefined}
         isRetrying={isRetrying}
-        variant={isNotFound ? 'warning' : 'danger'}
+        variant="danger"
       >
-        <Link
-          to="/"
-          className="mt-4 inline-block text-sm text-emerald-500 hover:underline"
-        >
+        <Link to="/" className="mt-4 inline-block text-sm text-emerald-500 hover:underline">
           Go home
         </Link>
       </ErrorState>
@@ -59,11 +65,11 @@ const UserProfileContent = ({ username }) => {
   if (!profile) return null;
 
   const isOwnProfile = isAuthenticated && authUser?.username === profile?.username;
-  const isFollowing = isAuthenticated && profile?.followers?.some(
-    (id) => id === authUser?._id || id?._id === authUser?._id
-  );
+  const isFollowing =
+    isAuthenticated &&
+    profile?.followers?.some((id) => id === authUser?._id || id?._id === authUser?._id);
 
-  const joinedDate = profile?.createdAt 
+  const joinedDate = profile?.createdAt
     ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     : 'Unknown Date';
 
@@ -156,8 +162,8 @@ const UserProfileContent = ({ username }) => {
           ) : (
             <div className="grid gap-3">
               {profile.repositories?.map((repo, i) => {
-                if (!repo) return null; 
-                
+                if (!repo) return null;
+
                 return (
                   <div
                     key={repo?._id || `repo-${i}`}

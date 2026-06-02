@@ -51,6 +51,10 @@ const repositorySchema = new mongoose.Schema(
         type: [String],
         default: [],
     },
+    prCount: {
+        type: Number,
+        default: 0,
+    },
 },
     { timestamps: true }
 );

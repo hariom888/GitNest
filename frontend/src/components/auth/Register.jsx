@@ -14,6 +14,7 @@ import {
   Code2,
   Wand2,
   Shield,
+  ArrowLeft,
 } from "lucide-react";
 import logo from "../../assets/logo.png";
 
@@ -164,7 +165,23 @@ const Register = () => {
           }}
         />
       </div>
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10">
+
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+          border border-zinc-200 dark:border-white/10
+          bg-white/80 dark:bg-zinc-900/80
+          backdrop-blur-md
+          text-zinc-700 dark:text-zinc-200
+          hover:bg-zinc-100 dark:hover:bg-zinc-800
+          transition-all duration-300 shadow-md hover:shadow-lg"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Link>
+      </div>   
+
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-16 md:py-10">
         <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-10 items-center animate-fadeIn">
           {/* LEFT */}
           <div>
@@ -398,7 +415,7 @@ const Register = () => {
                       onClick={() => setShowPassword((s) => !s)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white"
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                     </button>
                   </div>
                   {validationErrors.password && (
@@ -462,11 +479,9 @@ const Register = () => {
                       onClick={() => setShowConfirmPassword((s) => !s)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white"
                     >
-                      {showConfirmPassword ? (
-                        <EyeOff size={18} />
-                      ) : (
-                        <Eye size={18} />
-                      )}
+                      {showConfirmPassword ?
+                        <Eye size={18} /> : <EyeOff size={18} />
+                      }
                     </button>
                   </div>
                   {validationErrors.confirmPassword && (

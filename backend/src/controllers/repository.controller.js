@@ -3,6 +3,8 @@ import path from "path";
 import simpleGit from "simple-git";
 import mongoose from "mongoose";
 import Repository from "../models/Repository.model.js";
+import PullRequest from "../models/PullRequest.model.js";
+import Activity from "../models/Activity.model.js";
 import User from "../models/User.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/AppError.js";
@@ -12,6 +14,7 @@ import ACTIVITY_TYPES from "../constants/activityTypes.js";
 import paginate, { buildPaginationMeta } from "../utils/paginate.js";
 import { generateReadme } from "../utils/templates/readmeTemplates.js";
 import { generateGitignore } from "../utils/templates/gitignoreTemplates.js";
+import eventEmitter from '../events/eventEmitter.js';
 
 // DRY helper — resolves a :username param to the owner document's _id.
 // Returns null when the username does not exist so callers can 404 cleanly.
@@ -85,6 +88,14 @@ export const createRepository = asyncHandler(async (req, res, next) => {
   } catch {
     // Prevent activity logging failures from blocking repository creation
   }
+
+  eventEmitter.emit('REPO_CREATED', {
+    actorId: req.user._id,
+    repositoryId: repository._id,
+    repoName: repository.name,
+    visibility: repository.visibility,
+    ipAddress: req.ip,
+  });
 
   sendSuccess(res, 201, repository, "Repository created successfully");
 });
@@ -180,6 +191,14 @@ export const updateRepository = asyncHandler(async (req, res, next) => {
 
   await repository.save();
 
+  eventEmitter.emit('REPO_UPDATED', {
+    actorId: req.user._id,
+    repositoryId: repository._id,
+    repoName: repository.name,
+    changes: req.body,
+    ipAddress: req.ip,
+  });
+
   sendSuccess(res, 200, repository, "Repository updated successfully");
 });
 
@@ -200,7 +219,38 @@ export const deleteRepository = asyncHandler(async (req, res, next) => {
     return next(new AppError("Repository not found", 404));
   }
 
+  const repoId = repository._id;
+
+  // 1. Remove filesystem directory
+  const repoPath = path.resolve(process.cwd(), "repositories", req.user.id, repository.name);
+  fs.rmSync(repoPath, { recursive: true, force: true });
+
+  // 2. Nullify forkedFrom on repos that forked from this one
+  await Repository.updateMany(
+    { forkedFrom: repoId },
+    { $set: { forkedFrom: null } },
+  );
+
+  // 3. Remove this repo ID from forks arrays of other repos
+  await Repository.updateMany(
+    { forks: repoId },
+    { $pull: { forks: repoId } },
+  );
+
+  // 4. Delete orphaned Activity records referencing this repository
+  await Activity.deleteMany({ repository: repoId });
+
+  // 5. Delete PullRequest documents referencing this repository
+  await PullRequest.deleteMany({ repository: repoId });
+
   await repository.deleteOne();
+
+  eventEmitter.emit('REPO_DELETED', {
+    actorId: req.user._id,
+    repositoryId: repository._id,
+    repoName: repository.name,
+    ipAddress: req.ip,
+  });
 
   sendSuccess(res, 200, null, "Repository deleted successfully");
 });
