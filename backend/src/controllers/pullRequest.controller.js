@@ -212,6 +212,21 @@ export const mergePullRequest = asyncHandler(async (req, res, next) => {
   const pullRequest = await findPullRequest(req.params.id);
   if (pullRequest.status !== 'open') throw new AppError('Pull request is not open', 400);
 
+  // Evaluate branch protection rules before allowing the merge
+  const repositoryForEval = await resolveMergeRepository(pullRequest);
+  const evalResult = await evaluateMerge({
+    repository: repositoryForEval,
+    pullRequest,
+    userId: req.user._id,
+  });
+
+  if (!evalResult.allowed) {
+    throw new AppError(
+      `Merge blocked by branch protection rules: ${evalResult.reasons.join(' ')}`,
+      403
+    );
+  }
+
   const sagaId = req.headers['idempotency-key'] || uuidv4();
   const prId = pullRequest._id.toString();
 
