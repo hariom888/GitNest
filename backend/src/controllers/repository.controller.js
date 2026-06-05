@@ -164,8 +164,11 @@ export const updateRepository = asyncHandler(async (req, res, next) => {
   const { username, reponame } = req.params;
 
   const owner = await resolveOwner(username);
-  if (!owner || owner._id.toString() !== req.user.id) {
-    return next(new AppError("Repository not found or unauthorized", 404));
+  if (!owner) {
+    return next(new AppError("Repository not found", 404));
+  }
+  if (owner._id.toString() !== req.user.id) {
+    return next(new AppError("Forbidden: You do not own this repository", 403));
   }
 
   const repository = await Repository.findOne({
@@ -258,8 +261,11 @@ export const deleteRepository = asyncHandler(async (req, res, next) => {
   const { username, reponame } = req.params;
 
   const owner = await resolveOwner(username);
-  if (!owner || owner._id.toString() !== req.user.id) {
-    return next(new AppError("Repository not found or unauthorized", 404));
+  if (!owner) {
+    return next(new AppError("Repository not found", 404));
+  }
+  if (owner._id.toString() !== req.user.id) {
+    return next(new AppError("Forbidden: You do not own this repository", 403));
   }
 
   const repository = await Repository.findOne({
