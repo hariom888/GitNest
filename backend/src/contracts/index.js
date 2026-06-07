@@ -232,6 +232,83 @@ const symbolSearchData = {
   required: ['symbols', 'pagination'],
 };
 
+const dependencyListQuery = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    dependencyType: { type: 'string', minLength: 1, maxLength: 50 },
+    file: { type: 'string', minLength: 1, maxLength: 300 },
+    symbol: { type: 'string', minLength: 1, maxLength: 100 },
+    page: { type: 'integer', minimum: 1 },
+    limit: { type: 'integer', minimum: 1, maximum: 50 },
+  },
+};
+
+const dependencyImpactQuery = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    file: { type: 'string', minLength: 1, maxLength: 300 },
+    symbol: { type: 'string', minLength: 1, maxLength: 100 },
+    depth: { type: 'integer', minimum: 1, maximum: 10 },
+  },
+  anyOf: [{ required: ['file'] }, { required: ['symbol'] }],
+};
+
+const symbolNameParam = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    username: { type: 'string', minLength: 1, maxLength: 39 },
+    reponame: { type: 'string', minLength: 1, maxLength: 100 },
+    symbolName: { type: 'string', minLength: 1, maxLength: 100 },
+  },
+  required: ['username', 'reponame', 'symbolName'],
+};
+
+const dependencyListData = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    dependencies: { type: 'array', items: sharedSchemas.dependencyGraph },
+    pagination: sharedSchemas.pagination,
+  },
+  required: ['dependencies', 'pagination'],
+};
+
+const dependencyImpactData = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    seed: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        file: { type: ['string', 'null'] },
+        symbol: { type: ['string', 'null'] },
+      },
+      required: ['file', 'symbol'],
+    },
+    directDependencies: { type: 'array', items: sharedSchemas.dependencyGraph },
+    directDependents: { type: 'array', items: sharedSchemas.dependencyGraph },
+    affectedSymbols: { type: 'array', items: { type: 'string' } },
+    affectedFiles: { type: 'array', items: { type: 'string' } },
+    depthSummary: { type: 'object', additionalProperties: { type: 'integer', minimum: 0 } },
+  },
+  required: ['seed', 'directDependencies', 'directDependents', 'affectedSymbols', 'affectedFiles', 'depthSummary'],
+};
+
+const symbolDependenciesData = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    symbolName: { type: 'string' },
+    dependencies: { type: 'array', items: sharedSchemas.dependencyGraph },
+    dependents: { type: 'array', items: sharedSchemas.dependencyGraph },
+  },
+  required: ['symbolName', 'dependencies', 'dependents'],
+};
+
 export const contracts = {
   auth: {
     register: { tags: ['Auth'], summary: 'Register a user', request: { body: registerBody }, responses: { 201: sharedSchemas.successEnvelope(sharedSchemas.authUser) } },
@@ -311,6 +388,10 @@ export const contracts = {
     indexStatus: { tags: ['Code Intelligence'], security: [{ bearerAuth: [] }], request: { params: indexStatusParam }, responses: { 200: sharedSchemas.successEnvelope({ type: 'object', additionalProperties: true }) } },
     searchSymbols: { tags: ['Code Intelligence'], request: { params: sharedSchemas.repoParam, query: symbolSearchQuery }, responses: { 200: sharedSchemas.successEnvelope(symbolSearchData) } },
     symbolDetails: { tags: ['Code Intelligence'], request: { params: symbolDetailParam }, responses: { 200: sharedSchemas.successEnvelope(sharedSchemas.indexedSymbol) } },
+    rebuildDependencies: { tags: ['Code Intelligence'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 200: sharedSchemas.successEnvelope({ type: 'object', additionalProperties: false, properties: { edgeCount: { type: 'integer', minimum: 0 } }, required: ['edgeCount'] }) } },
+    listDependencies: { tags: ['Code Intelligence'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam, query: dependencyListQuery }, responses: { 200: sharedSchemas.successEnvelope(dependencyListData) } },
+    dependencyImpact: { tags: ['Code Intelligence'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam, query: dependencyImpactQuery }, responses: { 200: sharedSchemas.successEnvelope(dependencyImpactData) } },
+    symbolDependencies: { tags: ['Code Intelligence'], security: [{ bearerAuth: [] }], request: { params: symbolNameParam }, responses: { 200: sharedSchemas.successEnvelope(symbolDependenciesData) } },
   },
 };
 
