@@ -242,8 +242,7 @@ export const mergePullRequest = asyncHandler(async (req, res, next) => {
 
   const sagaId = req.headers['idempotency-key'] || uuidv4();
   const prId = pullRequest._id.toString();
-  const targetBranch = pullRequest.toBranch || pullRequest.targetBranch;
-  const sourceBranch = pullRequest.fromBranch || pullRequest.sourceBranch;
+  const actorId = req.user._id.toString();
 
   const mergeSteps = [
     {
@@ -253,6 +252,22 @@ export const mergePullRequest = asyncHandler(async (req, res, next) => {
         if (!pr) throw new AppError('Pull request not found', 404);
         if (pr.status !== 'open') {
           throw new AppError('Pull request is not open', 400);
+        }
+      },
+      compensate: null
+    },
+    {
+      name: 'checkBranchProtection',
+      execute: async (context) => {
+        const pr = await populatePullRequest(PullRequest.findById(context.prId));
+        if (!pr) throw new AppError('Pull request not found', 404);
+        const { allowed, isOwnerOverride, reasons } = await evaluateMerge({
+          repository: context.repository,
+          pullRequest: pr,
+          userId: context.actorId,
+        });
+        if (!allowed && !isOwnerOverride) {
+          throw new AppError(reasons.join(' '), 403);
         }
       },
       compensate: null
@@ -319,7 +334,7 @@ export const mergePullRequest = asyncHandler(async (req, res, next) => {
       sagaId,
       'MERGE_PULL_REQUEST',
       mergeSteps,
-      { prId, repoPath, targetBranch, sourceBranch }
+      { prId, repoPath, targetBranch, sourceBranch, actorId, repository }
     );
 
     const git = simpleGit(repoPath);
