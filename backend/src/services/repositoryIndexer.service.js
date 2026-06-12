@@ -7,6 +7,7 @@ import IndexedSymbol from '../models/IndexedSymbol.model.js';
 import { extractSymbolsFromFiles } from './symbolExtractor.js';
 import { DependencyGraphBuilder, extractDependencyEdgesFromFiles } from './dependencyGraphBuilder.service.js';
 import { ArchitectureMapping } from './architectureMapping.service.js';
+import { HealthScoring } from './healthScoring.service.js';
 
 export const REPOSITORY_INDEX_TYPE = 'REPOSITORY_INDEX';
 
@@ -84,6 +85,23 @@ export const buildRepositoryIndexSteps = () => [
       return {
         architectureRiskScore: analysis.riskScore,
         architectureGeneratedAt: analysis.generatedAt,
+      };
+    },
+  },
+  {
+    name: 'generate_repository_health',
+    execute: async (context, session) => {
+      const { repositoryId, repositoryName } = context;
+      const health = await HealthScoring.generateAndPersist({
+        repositoryId,
+        repositoryName,
+        session,
+      });
+
+      return {
+        healthScore: health.overallScore,
+        healthCategory: health.healthCategory,
+        healthGeneratedAt: health.generatedAt,
       };
     },
   },

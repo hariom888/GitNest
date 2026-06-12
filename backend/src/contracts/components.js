@@ -316,6 +316,72 @@ const architectureAnalysis = {
   ],
 };
 
+const healthCategory = { type: 'string', enum: ['Excellent', 'Good', 'Fair', 'Poor', 'Critical'] };
+
+const repositoryHealth = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    _id: { type: 'string' },
+    repositoryId: { type: 'string' },
+    repositoryName: { type: 'string' },
+    overallScore: { type: 'integer', minimum: 0, maximum: 100 },
+    securityScore: { type: 'integer', minimum: 0, maximum: 100 },
+    architectureScore: { type: 'integer', minimum: 0, maximum: 100 },
+    activityScore: { type: 'integer', minimum: 0, maximum: 100 },
+    maintainabilityScore: { type: 'integer', minimum: 0, maximum: 100 },
+    healthCategory,
+    summary: { type: 'string' },
+    metrics: { type: 'object', additionalProperties: true },
+    generatedAt: timestamp,
+  },
+  required: [
+    'repositoryId',
+    'repositoryName',
+    'overallScore',
+    'securityScore',
+    'architectureScore',
+    'activityScore',
+    'maintainabilityScore',
+    'healthCategory',
+    'metrics',
+    'generatedAt',
+  ],
+};
+
+const repositoryHealthBreakdown = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    overallScore: { type: 'integer', minimum: 0, maximum: 100 },
+    healthCategory,
+    scores: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        security: { type: 'integer', minimum: 0, maximum: 100 },
+        architecture: { type: 'integer', minimum: 0, maximum: 100 },
+        activity: { type: 'integer', minimum: 0, maximum: 100 },
+        maintainability: { type: 'integer', minimum: 0, maximum: 100 },
+      },
+      required: ['security', 'architecture', 'activity', 'maintainability'],
+    },
+    metrics: { type: 'object', additionalProperties: true },
+    generatedAt: timestamp,
+  },
+  required: ['overallScore', 'healthCategory', 'scores', 'metrics', 'generatedAt'],
+};
+
+const repositoryHealthRecommendation = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    code: { type: 'string' },
+    message: { type: 'string' },
+  },
+  required: ['code', 'message'],
+};
+
 export const components = {
   schemas: {
     SuccessEnvelope: successEnvelope({}),
@@ -335,6 +401,9 @@ export const components = {
     ArchitectureAnalysis: architectureAnalysis,
     ArchitectureHotspot: architectureHotspot,
     ArchitectureModule: architectureModule,
+    RepositoryHealth: repositoryHealth,
+    RepositoryHealthBreakdown: repositoryHealthBreakdown,
+    RepositoryHealthRecommendation: repositoryHealthRecommendation,
   },
   securitySchemes: {
     bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
@@ -363,5 +432,9 @@ export const sharedSchemas = {
   architectureAnalysis,
   architectureHotspot,
   architectureModule,
+  healthCategory,
+  repositoryHealth,
+  repositoryHealthBreakdown,
+  repositoryHealthRecommendation,
   riskScore,
 };

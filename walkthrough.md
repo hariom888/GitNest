@@ -1,6 +1,6 @@
-# Repository Indexing, Dependency Graphs, Impact Analysis & Architecture Mapping
+# Repository Indexing, Dependency Graphs, Impact Analysis, Architecture Mapping & Health Governance
 
-GitNest now includes a lightweight in-process repository indexing pipeline for JS/TS code intelligence, dependency graph impact analysis, and architecture risk mapping.
+GitNest now includes a lightweight in-process repository indexing pipeline for JS/TS code intelligence, dependency graph impact analysis, architecture risk mapping, and repository health governance.
 
 ## What changed
 
@@ -14,6 +14,9 @@ GitNest now includes a lightweight in-process repository indexing pipeline for J
 - `ArchitectureAnalysis` persists a generated architecture snapshot after dependency graph generation.
 - `ArchitectureMapping` derives module relationships, entry points, service boundaries, dependency density, hotspots, and bounded circular dependencies from `IndexedSymbol` and `DependencyGraph`.
 - `RiskScoring` returns deterministic `LOW`, `MEDIUM`, `HIGH`, or `CRITICAL` risk levels from dependency count, coupling, cycles, and hotspot participation.
+- `RepositoryHealth` stores deterministic health snapshots with overall, security, architecture, activity, and maintainability scores.
+- `HealthScoring` aggregates existing security events, dependency graph data, architecture analysis, activity, and pull request metrics after architecture analysis completes.
+- `RepositoryGovernance` returns a summary, score breakdown, and rule-based recommendations such as security findings, high dependency coupling, excessive architecture risk, and low activity.
 - REST APIs were added under `/api/v1/repositories/:username/:reponame`.
 
 ## APIs
@@ -30,12 +33,17 @@ GitNest now includes a lightweight in-process repository indexing pipeline for J
 - `GET /architecture/hotspots` returns hotspot metadata.
 - `GET /architecture/risk` returns repository risk metadata.
 - `GET /architecture/module/:moduleName` returns module risk and relationships.
+- `GET /health` returns the latest health snapshot with summary.
+- `GET /health/history` returns recent health snapshots.
+- `GET /health/breakdown` returns score breakdown and source metrics.
+- `GET /health/recommendations` returns rule-based governance recommendations.
 
 ## Verification
 
 ```bash
 cd backend
 npm test -- architecture.test.js
+npm test -- repositoryHealth.test.js
 npm test -- codeIntelligence.test.js
 npm test
 npm run test:contracts

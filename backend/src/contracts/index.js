@@ -352,6 +352,24 @@ const architectureModuleData = {
   required: ['module', 'relationships', 'hotspots'],
 };
 
+const repositoryHealthHistoryData = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    history: { type: 'array', items: sharedSchemas.repositoryHealth },
+  },
+  required: ['history'],
+};
+
+const repositoryHealthRecommendationsData = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    recommendations: { type: 'array', items: sharedSchemas.repositoryHealthRecommendation },
+  },
+  required: ['recommendations'],
+};
+
 export const contracts = {
   auth: {
     register: { tags: ['Auth'], summary: 'Register a user', request: { body: registerBody }, responses: { 201: sharedSchemas.successEnvelope(sharedSchemas.authUser) } },
@@ -441,6 +459,12 @@ export const contracts = {
     hotspots: { tags: ['Architecture'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 200: sharedSchemas.successEnvelope(architectureHotspotsData) } },
     risk: { tags: ['Architecture'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 200: sharedSchemas.successEnvelope(architectureRiskData) } },
     module: { tags: ['Architecture'], security: [{ bearerAuth: [] }], request: { params: architectureModuleParam }, responses: { 200: sharedSchemas.successEnvelope(architectureModuleData) } },
+  },
+  repositoryHealth: {
+    get: { tags: ['Repository Health'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 200: sharedSchemas.successEnvelope(sharedSchemas.repositoryHealth) } },
+    history: { tags: ['Repository Health'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 200: sharedSchemas.successEnvelope(repositoryHealthHistoryData) } },
+    breakdown: { tags: ['Repository Health'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 200: sharedSchemas.successEnvelope(sharedSchemas.repositoryHealthBreakdown) } },
+    recommendations: { tags: ['Repository Health'], security: [{ bearerAuth: [] }], request: { params: sharedSchemas.repoParam }, responses: { 200: sharedSchemas.successEnvelope(repositoryHealthRecommendationsData) } },
   },
 };
 
