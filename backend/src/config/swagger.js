@@ -84,6 +84,16 @@ const paths = {
   '/api/v1/repositories/{username}/{reponame}/dependencies': { get: op(contracts.codeIntelligence.listDependencies) },
   '/api/v1/repositories/{username}/{reponame}/dependencies/impact': { get: op(contracts.codeIntelligence.dependencyImpact) },
   '/api/v1/repositories/{username}/{reponame}/dependencies/symbol/{symbolName}': { get: op(contracts.codeIntelligence.symbolDependencies) },
+  '/api/v1/repositories/{username}/{reponame}/architecture': { get: op(contracts.architecture.get) },
+  '/api/v1/repositories/{username}/{reponame}/architecture/hotspots': { get: op(contracts.architecture.hotspots) },
+  '/api/v1/repositories/{username}/{reponame}/architecture/risk': { get: op(contracts.architecture.risk) },
+  '/api/v1/repositories/{username}/{reponame}/architecture/module/{moduleName}': { get: op(contracts.architecture.module) },
+  '/api/v1/repositories/{username}/{reponame}/health': { get: op(contracts.repositoryHealth.get) },
+  '/api/v1/repositories/{username}/{reponame}/health/history': { get: op(contracts.repositoryHealth.history) },
+  '/api/v1/repositories/{username}/{reponame}/health/breakdown': { get: op(contracts.repositoryHealth.breakdown) },
+  '/api/v1/repositories/{username}/{reponame}/health/recommendations': {
+    get: op(contracts.repositoryHealth.recommendations),
+  },
 };
 
 const definition = {
@@ -94,7 +104,7 @@ const definition = {
     description: 'Schema-driven API contract for GitNest MERN services.',
   },
   servers: [{ url: process.env.API_PUBLIC_URL || 'http://localhost:5000' }],
-  tags: ['Auth', 'Users', 'Repositories', 'Activities', 'Pull Requests', 'Code Intelligence'].map((name) => ({ name })),
+  tags: ['Auth', 'Users', 'Repositories', 'Activities', 'Pull Requests', 'Code Intelligence', 'Architecture', 'Repository Health'].map((name) => ({ name })),
   components,
   paths,
 };

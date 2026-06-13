@@ -15,6 +15,7 @@ import auditLogRoutes from './routes/auditLog.routes.js';
 import activityRoutes from './routes/activity.routes.js';
 import pullRequestRoutes from './routes/pullRequest.routes.js';
 import architectureRoutes from './routes/architectureRoutes.js';
+import repositoryHealthRoutes from './routes/repositoryHealth.routes.js';
 import healthRoute from './routes/health.route.js';
 import commitHistoryRoutes from './routes/commitHistory.routes.js';
 import fileBrowserRoutes from './routes/fileBrowser.routes.js';
@@ -129,6 +130,8 @@ const createApp = () => {
   app.use('/api/v1/repositories', branchRoutes);
   app.use('/api/v1/repos', gitRoutes);
   app.use('/api/v1/repositories', codeIntelligenceRoutes);
+  app.use('/api/v1/repositories', architectureRoutes);
+  app.use('/api/v1/repositories', repositoryHealthRoutes);
   app.use('/api/v1/search', searchRoutes);
   app.use('/api/v1/auth', githubAuthRoutes);
   app.use('/api/v1/repositories', cloneRoutes);
