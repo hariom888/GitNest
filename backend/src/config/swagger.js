@@ -88,6 +88,22 @@ const paths = {
   '/api/v1/repositories/{username}/{reponame}/architecture/hotspots': { get: op(contracts.architecture.hotspots) },
   '/api/v1/repositories/{username}/{reponame}/architecture/risk': { get: op(contracts.architecture.risk) },
   '/api/v1/repositories/{username}/{reponame}/architecture/module/{moduleName}': { get: op(contracts.architecture.module) },
+  '/api/v1/repositories/{username}/{reponame}/health': { get: op(contracts.repositoryHealth.get) },
+  '/api/v1/repositories/{username}/{reponame}/health/history': { get: op(contracts.repositoryHealth.history) },
+  '/api/v1/repositories/{username}/{reponame}/health/breakdown': { get: op(contracts.repositoryHealth.breakdown) },
+  '/api/v1/repositories/{username}/{reponame}/health/recommendations': {
+    get: op(contracts.repositoryHealth.recommendations),
+  },
+  '/api/v1/repositories/{username}/{reponame}/compliance': { get: op(contracts.repositoryCompliance.get) },
+  '/api/v1/repositories/{username}/{reponame}/compliance/history': {
+    get: op(contracts.repositoryCompliance.history),
+  },
+  '/api/v1/repositories/{username}/{reponame}/compliance/violations': {
+    get: op(contracts.repositoryCompliance.violations),
+  },
+  '/api/v1/repositories/{username}/{reponame}/compliance/report': {
+    get: op(contracts.repositoryCompliance.report),
+  },
 };
 
 const definition = {
@@ -98,7 +114,7 @@ const definition = {
     description: 'Schema-driven API contract for GitNest MERN services.',
   },
   servers: [{ url: process.env.API_PUBLIC_URL || 'http://localhost:5000' }],
-  tags: ['Auth', 'Users', 'Repositories', 'Activities', 'Pull Requests', 'Code Intelligence', 'Architecture'].map((name) => ({ name })),
+  tags: ['Auth', 'Users', 'Repositories', 'Activities', 'Pull Requests', 'Code Intelligence', 'Architecture', 'Repository Health', 'Repository Compliance'].map((name) => ({ name })),
   components,
   paths,
 };
