@@ -14,6 +14,8 @@ import { extractSymbolsFromFiles } from '../services/symbolExtractor.js';
 import { DependencyGraphBuilder } from '../services/dependencyGraphBuilder.service.js';
 import { ImpactAnalysis } from '../services/impactAnalysis.service.js';
 import { ArchitectureMapping } from '../services/architectureMapping.service.js';
+import { HealthScoring } from '../services/healthScoring.service.js';
+import { PolicyEvaluation } from '../services/policyEvaluation.service.js';
 import paginate, { buildPaginationMeta } from '../utils/paginate.js';
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -163,6 +165,15 @@ export const rebuildDependencies = asyncHandler(async (req, res) => {
   await ArchitectureMapping.generateAndPersist({
     repositoryId: repository._id,
     repositoryName: repository.name,
+  });
+  const health = await HealthScoring.generateAndPersist({
+    repositoryId: repository._id,
+    repositoryName: repository.name,
+  });
+  await PolicyEvaluation.evaluateAndPersist({
+    repositoryId: repository._id,
+    repositoryName: repository.name,
+    health,
   });
 
   sendSuccess(res, 200, { edgeCount }, 'Dependency graph rebuilt');
