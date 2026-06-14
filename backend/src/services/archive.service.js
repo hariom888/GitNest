@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import archiver from 'archiver';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const archiver = require('archiver');
 
 export const generateRepositoryArchive = (
   userId,
