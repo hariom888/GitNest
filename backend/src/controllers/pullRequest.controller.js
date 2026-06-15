@@ -14,6 +14,7 @@ import SagaOrchestrator from '../services/saga/sagaOrchestrator.js';
 import eventEmitter from '../events/eventEmitter.js';
 import { evaluateMerge } from '../services/branchProtectionEvaluator.service.js';
 import { acquireRepoLock } from '../utils/repoMutex.js';
+import { compareBranches } from '../services/pullRequest.service.js';
 
 const populatePullRequest = (query) =>
   query.populate('author', 'username avatarUrl').populate('repository', 'name owner defaultBranch').populate('comments.author', 'username avatarUrl').populate('reviews.author', 'username avatarUrl');
@@ -172,6 +173,65 @@ export const getPullRequest = asyncHandler(async (req, res) => {
   sendSuccess(res, 200, serializePullRequest(pullRequest), 'Pull request fetched successfully');
 });
 
+export const comparePullRequestBranches = asyncHandler(
+  async (req, res, next) => {
+    const {
+      username,
+      repoName,
+      sourceBranch,
+      targetBranch,
+    } = req.query;
+
+    if (
+      !username ||
+      !repoName ||
+      !sourceBranch ||
+      !targetBranch
+    ) {
+      return next(
+        new AppError(
+          'username, repoName, sourceBranch and targetBranch are required',
+          400
+        )
+      );
+    }
+
+    const owner = await User.findOne({
+      username: username.toLowerCase(),
+    });
+
+    if (!owner) {
+      return next(new AppError('User not found', 404));
+    }
+
+    const repository = await Repository.findOne({
+      owner: owner._id,
+      name: repoName,
+    });
+
+    if (!repository) {
+      return next(new AppError('Repository not found', 404));
+    }
+
+    if (
+      repository.visibility === 'private' &&
+      (!req.user ||
+        req.user._id.toString() !== owner._id.toString())
+    ) {
+      return next(new AppError('Repository not found', 404));
+    }
+
+    const result = await compareBranches(
+      owner._id.toString(),
+      repository.name,
+      sourceBranch,
+      targetBranch
+    );
+
+    sendSuccess(res,200,result, 'Branches compared successfully');
+  }
+);
+
 export const createPullRequest = asyncHandler(async (req, res) => {
   const repository = await resolveRepository(req.body.repository, req.body.repositoryId, req.body.username);
 
@@ -248,6 +308,9 @@ export const mergePullRequest = asyncHandler(async (req, res, next) => {
   const sagaId = req.headers['idempotency-key'] || uuidv4();
   const prId = pullRequest._id.toString();
   const actorId = req.user._id.toString();
+
+  const sourceBranch = pullRequest.sourceBranch;
+  const targetBranch = pullRequest.targetBranch;
 
   const mergeSteps = [
     {
