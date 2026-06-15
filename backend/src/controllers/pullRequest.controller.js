@@ -249,6 +249,9 @@ export const mergePullRequest = asyncHandler(async (req, res, next) => {
   const prId = pullRequest._id.toString();
   const actorId = req.user._id.toString();
 
+  const sourceBranch = pullRequest.sourceBranch;
+  const targetBranch = pullRequest.targetBranch;
+
   const mergeSteps = [
     {
       name: 'validateOpen',
