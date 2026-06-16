@@ -132,7 +132,7 @@ router.post("/exchange", exchangeLimiter, async (req, res) => {
   }
 
   if (!jwt) {
-    logFailedExchange(clientIp, code.substring(0, 8), jwt === null ? "not_found_or_expired" : "deleted");
+    logFailedExchange(clientIp, code.substring(0, 8), "not_found_or_expired");
     return res.status(401).json({ message: "Invalid or expired exchange code" });
   }
 
